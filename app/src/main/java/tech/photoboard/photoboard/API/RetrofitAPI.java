@@ -2,11 +2,13 @@ package tech.photoboard.photoboard.API;
 
 import android.media.Image;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import tech.photoboard.photoboard.Photo;
 import tech.photoboard.photoboard.Utils.User;
 
 /**
@@ -18,9 +20,9 @@ public interface RetrofitAPI {
     @GET("/login/{user}")
     Call<String> login(@Path("user") User user);
 
-    @GET("/getPicturesList/{device}/{gallery}")
+    @GET("pictures")
 
-    Call<List<Image>> getPicturesList(@Path("device") String device, @Path("gallery") String gallery);
+    Call<ArrayList<Photo>> getPicturesList();
 
     @GET("/takePhotoRequest/{device}")
 

@@ -26,8 +26,8 @@
         <Button
             android:layout_width="0dp"
             android:layout_weight="5"
-            android:layout_height="10dp"
-            android:text="Search Devices"
+            android:layout_height="45dp"
+            android:text="Search"
             android:id="@+id/btn_search_devices"
             android:layout_marginRight="6dp"
             />
@@ -36,7 +36,7 @@
             android:text="Dismiss"
             android:layout_width="0dp"
             android:layout_weight="5"
-            android:layout_height="10dp"
+            android:layout_height="45dp"
             android:id="@+id/btn_dismiss" />
 
 

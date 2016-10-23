@@ -57,7 +57,7 @@ public class FullScreenImageAdapter extends PagerAdapter {
         View viewLayout = inflater.inflate(R.layout.adapter_fullscreen_image, container,false);
         imgDisplay = (ImageView) viewLayout.findViewById(R.id.iv_fullscreen_adapter);
         Picasso.with(activity)
-                .load(photoList.get(position).getURL())
+                .load("http://10.180.16.62:8000" + photoList.get(position).getPicture())
                 .into(imgDisplay);
         PhotoViewAttacher photoViewAttacher = new PhotoViewAttacher(imgDisplay);
 

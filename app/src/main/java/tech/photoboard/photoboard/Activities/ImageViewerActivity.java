@@ -56,7 +56,9 @@ public class ImageViewerActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Picasso.with(ImageViewerActivity.this)
-                        .load(photoList.get(viewPager.getCurrentItem()).getURL())
+                        .load(photoList.get(viewPager.getCurrentItem()).getPicture())
+                        .skipMemoryCache()
+                        .noFade()
                         .into(target);
             }
         });
@@ -72,7 +74,7 @@ public class ImageViewerActivity extends Activity {
                             Environment.DIRECTORY_PICTURES), "Photoboard");
                     folder.mkdirs();
 
-                    String url =  photoList.get(viewPager.getCurrentItem()).getURL();
+                    String url =  photoList.get(viewPager.getCurrentItem()).getPicture();
                     if(url == null) return;
                     String name = url.substring(url.lastIndexOf("/")+1);
                     File file = new File(folder, name);

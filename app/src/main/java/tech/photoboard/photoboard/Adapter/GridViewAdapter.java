@@ -2,6 +2,7 @@ package tech.photoboard.photoboard.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Picture;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -19,6 +20,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import retrofit2.Retrofit;
+import tech.photoboard.photoboard.API.ApiClient;
 import tech.photoboard.photoboard.Activities.ImageViewerActivity;
 import tech.photoboard.photoboard.Photo;
 import tech.photoboard.photoboard.R;
@@ -39,6 +42,7 @@ public class GridViewAdapter extends BaseAdapter {
     }
 
 
+
     @Override
     public int getCount() {
         return photoList.size();
@@ -54,8 +58,10 @@ public class GridViewAdapter extends BaseAdapter {
         return position;
     }
 
+
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
+
         SquareImageView img;
         if(convertView == null) {
             img = new SquareImageView(context);
@@ -85,11 +91,21 @@ public class GridViewAdapter extends BaseAdapter {
         });
 
         Picasso.with(context)
-                .load(photoList.get(position).getURL())
+                .load("http://10.180.16.62:8000" + photoList.get(position).getPicture())
+                .skipMemoryCache()
                 .noFade()
-                .placeholder(R.mipmap.ic_launcher)
                 .into(img);
+
+
+
+
 
         return convertView;
     }
+
+    public void addToList(List<Photo> pictures){
+        photoList.addAll(pictures);
+        this.notifyDataSetChanged();
+    }
+
 }

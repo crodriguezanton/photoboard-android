@@ -5,12 +5,27 @@ package tech.photoboard.photoboard;
  */
 
 public class Photo {
-    private String URL;
+    private String picture;
+    private int id;
 
-    public Photo (String URL) {
-        this.URL = URL;
+    public Photo (String picture, int id) {
+        this.id = id;
+        this.picture = picture;
     }
-    public String getURL() {
-        return this.URL;
+    public String getPicture() {
+        return this.picture;
     }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
 }

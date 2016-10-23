@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,9 +20,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import tech.photoboard.photoboard.API.ApiClient;
+import tech.photoboard.photoboard.API.RetrofitAPI;
 import tech.photoboard.photoboard.Adapter.GridViewAdapter;
 import tech.photoboard.photoboard.Photo;
 import tech.photoboard.photoboard.R;
+
+import static tech.photoboard.photoboard.API.ApiClient.getClient;
 
 public class MainPageActivity extends AppCompatActivity implements BluetoothListDialogFragment.OnItemSelectedListener {
     public static final int PHOTO_MODE = 10;
@@ -55,6 +64,10 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        final RetrofitAPI retrofitAPI = ApiClient.getClient().create(RetrofitAPI.class);
+
+
+
         //Bluetooth
         btnTakePhoto = (FloatingActionButton) findViewById(R.id.btn_take_capture);
         btnTakePhoto.setImageResource(R.drawable.ic_btn_bluetooth);
@@ -64,11 +77,27 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
 
         //GridView
         photoList = new ArrayList<>();
-        int i =0;
-        for(String p: photos) {
-            photoList.add(new Photo(p));
-        }
+
+        Call<ArrayList<Photo>> getPhotos = retrofitAPI.getPicturesList();
+
+        getPhotos.enqueue(new Callback<ArrayList<Photo>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Photo>> call, Response<ArrayList<Photo>> response) {
+                photoList = response.body();
+                for(int i=0; i < photoList.size(); i++){
+                    Log.e("Message", String.valueOf(photoList.get(i).getId()) + " " + photoList.get(i).getPicture());
+                }
+                gridViewAdapter.addToList(photoList);
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Photo>> call, Throwable t) {
+
+            }
+        });
+
         gridview = (GridView) findViewById(R.id.gv_main_page);
+        gridview.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
         gridViewAdapter = new GridViewAdapter(MainPageActivity.this,photoList);
         gridview.setAdapter(gridViewAdapter);
 

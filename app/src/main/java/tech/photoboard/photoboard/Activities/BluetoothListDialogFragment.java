@@ -141,6 +141,7 @@ public class BluetoothListDialogFragment extends DialogFragment {
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                bluetoothAdapter.cancelDiscovery();
                 searchDevices();
             }
         });
@@ -148,6 +149,7 @@ public class BluetoothListDialogFragment extends DialogFragment {
         btnDismiss.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                bluetoothAdapter.cancelDiscovery();
                 dismiss();
             }
         });
