@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    >
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/lv_bluetooth_devices"
+        android:layout_below="@+id/tv_bluetooth_devices"
+        android:layout_above="@+id/lin_lay">
+    </ListView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/lin_lay"
+        android:orientation="horizontal"
+        android:weightSum="10"
+        android:padding="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="10dp"
+            android:text="Search Devices"
+            android:id="@+id/btn_search_devices"
+            android:layout_marginRight="6dp"
+            />
+
+        <Button
+            android:text="Dismiss"
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="10dp"
+            android:id="@+id/btn_dismiss" />
+
+
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        android:text="Bluetooth devices"
+        android:id="@+id/tv_bluetooth_devices"
+        />
+
+
+</RelativeLayout>

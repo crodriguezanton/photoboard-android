@@ -1,13 +1,18 @@
 package tech.photoboard.photoboard.Activities;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -18,13 +23,19 @@ import tech.photoboard.photoboard.Adapter.GridViewAdapter;
 import tech.photoboard.photoboard.Photo;
 import tech.photoboard.photoboard.R;
 
-public class MainPageActivity extends AppCompatActivity {
+public class MainPageActivity extends AppCompatActivity implements BluetoothListDialogFragment.OnItemSelectedListener {
     public static final int PHOTO_MODE = 10;
     public static final int BLUETOOTH_MODE = 11;
     public int currentMode;
     private ArrayList<Photo> photoList;
     private GridView gridview;
     private GridViewAdapter gridViewAdapter;
+
+    FloatingActionButton btnTakePhoto;
+    BluetoothAdapter bluetoothAdapter;
+    BluetoothDevice bluetoothDevice;
+    boolean bluetoothEnabledSocked;
+    final static int BLUETOOTH_REQUEST_ENABLE = 1;
 
     public String[] photos = {
             "http://www.qdtricks.org/wp-content/uploads/2015/02/hd-wallpapers-1080p-for-mobile.png",
@@ -43,16 +54,25 @@ public class MainPageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_page);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //Bluetooth
+        btnTakePhoto = (FloatingActionButton) findViewById(R.id.btn_take_capture);
+        btnTakePhoto.setImageResource(R.drawable.ic_btn_bluetooth);
+        currentMode = BLUETOOTH_MODE;
+        bluetoothDevice = null;
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        //GridView
         photoList = new ArrayList<>();
         int i =0;
         for(String p: photos) {
             photoList.add(new Photo(p));
         }
-
         gridview = (GridView) findViewById(R.id.gv_main_page);
         gridViewAdapter = new GridViewAdapter(MainPageActivity.this,photoList);
         gridview.setAdapter(gridViewAdapter);
 
+        //Setting the functionality of the button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.btn_take_capture);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,6 +83,23 @@ public class MainPageActivity extends AppCompatActivity {
                         break;
                     case BLUETOOTH_MODE:
                         Toast.makeText(MainPageActivity.this, "Searching Bluetooth", Toast.LENGTH_SHORT).show();
+                        //Check if bluetooth is supported
+                        if (bluetoothAdapter == null) {
+                        } else {
+                            //Check if bluetooth is enabled and try to enable it
+                            if (!bluetoothAdapter.isEnabled()) {
+                                Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                                startActivityForResult(enableBluetoothIntent, BLUETOOTH_REQUEST_ENABLE);
+                            }
+                            //If it's enabled show the Dialog
+                            else {
+                                DialogFragment newFragment = new BluetoothListDialogFragment();
+                                newFragment.show(getSupportFragmentManager(), "dialog");
+                            }
+                        }
+
+                            //If it's not take the pictures
+
                         break;
                     default:
                         Toast.makeText(MainPageActivity.this, "Something wrong is going on here", Toast.LENGTH_SHORT).show();
@@ -71,6 +108,17 @@ public class MainPageActivity extends AppCompatActivity {
                /*nackbar.make(view, "What in the world is going on", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             */}
+        });
+        fab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if(currentMode == PHOTO_MODE) {
+                    Toast.makeText(MainPageActivity.this, "Changed to Bluetooth Functionality", Toast.LENGTH_SHORT).show();
+                    btnTakePhoto.setImageResource(R.drawable.ic_btn_bluetooth);
+                    currentMode = BLUETOOTH_MODE;
+                }
+                return false;
+            }
         });
     }
 
@@ -95,4 +143,28 @@ public class MainPageActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onItemSelected(BluetoothDevice bd) {
+        bluetoothDevice = bd;
+        currentMode = PHOTO_MODE;
+        btnTakePhoto.setImageResource(R.drawable.ic_btn_photo);
+
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //Manage the activity result for the BluetoothEnable
+        if(requestCode == BLUETOOTH_REQUEST_ENABLE) {
+            //Check if the intent to enable the bluetooth was successful
+            if (resultCode == RESULT_CANCELED) {
+                //If it is, show de DialogFragment
+            } else if (resultCode == RESULT_OK) {
+                DialogFragment newFragment = new BluetoothListDialogFragment();
+                newFragment.show(getSupportFragmentManager(), "dialog");
+
+            }
+        }
+    }
+
 }
