@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="tech.photoboard.photoboard.Activities.MainPageActivity">
+    tools:context="tech.photoboard.photoboard.Activities.MainPageActivity"
+    >
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -21,7 +22,14 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_main_page" />
+    <GridView
+        android:id="@+id/gv_main_page"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:stretchMode="columnWidth"
+        android:numColumns="auto_fit"
+        >
+    </GridView>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btn_take_capture"

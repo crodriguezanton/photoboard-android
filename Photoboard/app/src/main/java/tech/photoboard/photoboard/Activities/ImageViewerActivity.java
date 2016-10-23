@@ -11,12 +11,20 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+
+
+import tech.photoboard.photoboard.Adapter.FullScreenImageAdapter;
+import tech.photoboard.photoboard.Photo;
+import tech.photoboard.photoboard.R;
 
 /**
  * Created by pc1 on 23/10/2016.
@@ -24,8 +32,8 @@ import java.util.ArrayList;
 
 public class ImageViewerActivity extends Activity {
 
-    private ArrayList<String> photoList;
-    private FullScreenImage adapter;
+    private ArrayList<Photo> photoList;
+    private FullScreenImageAdapter adapter;
     private ViewPager viewPager;
     private int imgSelected;
     private ImageButton btnDownload;
@@ -33,11 +41,13 @@ public class ImageViewerActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fullscreen_image);
+        setContentView(R.layout.activity_image_viewer);
 
         imgSelected = getIntent().getIntExtra("POSITION",0);
-        images =  (ArrayList<String>)getIntent().getSerializableExtra("FULLSCREEN_IMAGES");
-        adapter = new FullScreenImageAdapter(FullScreenImageActivity.this,images);
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<Photo>>(){}.getType();
+        photoList =  gson.fromJson(getIntent().getStringExtra("FULLSCREEN_IMAGES"), type);
+        adapter = new FullScreenImageAdapter(ImageViewerActivity.this,photoList);
         viewPager = (ViewPager) findViewById(R.id.vp_image_pager);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(imgSelected);
@@ -45,8 +55,8 @@ public class ImageViewerActivity extends Activity {
         btnDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Picasso.with(FullScreenImageActivity.this)
-                        .load(images.get(viewPager.getCurrentItem()))
+                Picasso.with(ImageViewerActivity.this)
+                        .load(photoList.get(viewPager.getCurrentItem()).getURL())
                         .into(target);
             }
         });
@@ -62,7 +72,7 @@ public class ImageViewerActivity extends Activity {
                             Environment.DIRECTORY_PICTURES), "Photoboard");
                     folder.mkdirs();
 
-                    String url =  images.get(viewPager.getCurrentItem());
+                    String url =  photoList.get(viewPager.getCurrentItem()).getURL();
                     if(url == null) return;
                     String name = url.substring(url.lastIndexOf("/")+1);
                     File file = new File(folder, name);

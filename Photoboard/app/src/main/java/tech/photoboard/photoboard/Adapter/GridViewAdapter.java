@@ -7,14 +7,22 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
+
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONObject;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import tech.photoboard.photoboard.Activities.ImageViewerActivity;
 import tech.photoboard.photoboard.Photo;
+import tech.photoboard.photoboard.R;
+import tech.photoboard.photoboard.Utils.SquareImageView;
 
 /**
  * Created by pc1 on 23/10/2016.
@@ -23,7 +31,7 @@ import tech.photoboard.photoboard.Photo;
 public class GridViewAdapter extends BaseAdapter {
 
     private Context context;
-    private ArrayList<Photo> photoList;
+    private List<Photo> photoList;
 
     public GridViewAdapter(Context context, ArrayList<Photo> photoList) {
         this.context = context;
@@ -48,16 +56,16 @@ public class GridViewAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        ImageView img;
+        SquareImageView img;
         if(convertView == null) {
-            img = new ImageView(context);
+            img = new SquareImageView(context);
             convertView = img;
-            img.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            img.setScaleType(SquareImageView.ScaleType.CENTER_CROP);
 
 
         } else {
 
-            img = (ImageView) convertView;
+            img = (SquareImageView) convertView;
 
         }
 
@@ -67,15 +75,19 @@ public class GridViewAdapter extends BaseAdapter {
                 //Llama a la nueva actividad
 
                 Intent intent = new Intent(context, ImageViewerActivity.class);
-                intent.putExtra("FULLSCREEN_IMAGES", photoList);
+                Gson gson = new Gson();
+                String json = gson.toJson(photoList);
+                intent.putExtra("FULLSCREEN_IMAGES",json);
                 intent.putExtra("POSITION",position);
                 context.startActivity(intent);
+
             }
         });
 
         Picasso.with(context)
                 .load(photoList.get(position).getURL())
                 .noFade()
+                .placeholder(R.mipmap.ic_launcher)
                 .into(img);
 
         return convertView;
