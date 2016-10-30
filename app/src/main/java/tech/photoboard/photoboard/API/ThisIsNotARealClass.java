@@ -26,7 +26,7 @@ public class ThisIsNotARealClass extends Activity {
 
         final RetrofitAPI retrofitAPI = ApiClient.getClient().create(RetrofitAPI.class);
 
-        Call<TakePhotoResponse> takePhotoCall = retrofitAPI.takePhotoRequest(device);
+        Call<TakePhotoResponse> takePhotoCall = retrofitAPI.takePhotoRequest();
 
         bool = true;
 

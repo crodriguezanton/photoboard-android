@@ -26,19 +26,24 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import tech.photoboard.photoboard.API.ApiClient;
 import tech.photoboard.photoboard.API.RetrofitAPI;
+import tech.photoboard.photoboard.API.TakePhotoResponse;
 import tech.photoboard.photoboard.Adapter.GridViewAdapter;
 import tech.photoboard.photoboard.Photo;
 import tech.photoboard.photoboard.R;
+import tech.photoboard.photoboard.Utils.ServerManager;
 
 import static tech.photoboard.photoboard.API.ApiClient.getClient;
 
-public class MainPageActivity extends AppCompatActivity implements BluetoothListDialogFragment.OnItemSelectedListener {
+public class MainPageActivity extends AppCompatActivity implements BluetoothListDialogFragment.OnItemSelectedListener
+        , ServerManager.getPhotosResquest{
     public static final int PHOTO_MODE = 10;
     public static final int BLUETOOTH_MODE = 11;
     public int currentMode;
     private ArrayList<Photo> photoList;
     private GridView gridview;
     private GridViewAdapter gridViewAdapter;
+    private TakePhotoResponse requestData;
+    ServerManager serverManager;
 
     FloatingActionButton btnTakePhoto;
     BluetoothAdapter bluetoothAdapter;
@@ -55,6 +60,7 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
             "http://cdn.wonderfulengineering.com/wp-content/uploads/2014/05/mobile-samsung-16-610x1084.jpg",
             "http://www.mobileswall.com/wp-content/uploads/2015/11/300-Black-Baroque-Pattern-l.jpg"
     };
+    final RetrofitAPI retrofitAPI = ApiClient.getClient().create(RetrofitAPI.class);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +70,24 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final RetrofitAPI retrofitAPI = ApiClient.getClient().create(RetrofitAPI.class);
 
+
+        Call<ArrayList<Photo>> getPhotos = retrofitAPI.getPicturesList();
+        getPhotos.enqueue(new Callback<ArrayList<Photo>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Photo>> call, Response<ArrayList<Photo>> response) {
+                photoList = response.body();
+                for(int i=0; i < photoList.size(); i++){
+                    Log.e("Message", String.valueOf(photoList.get(i).getId()) + " " + photoList.get(i).getPicture());
+                }
+                onGetPhotoResponse(photoList);
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Photo>> call, Throwable t) {
+
+            }
+        });
 
 
         //Bluetooth
@@ -77,24 +99,10 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
 
         //GridView
         photoList = new ArrayList<>();
+        requestData = null;
 
-        Call<ArrayList<Photo>> getPhotos = retrofitAPI.getPicturesList();
-
-        getPhotos.enqueue(new Callback<ArrayList<Photo>>() {
-            @Override
-            public void onResponse(Call<ArrayList<Photo>> call, Response<ArrayList<Photo>> response) {
-                photoList = response.body();
-                for(int i=0; i < photoList.size(); i++){
-                    Log.e("Message", String.valueOf(photoList.get(i).getId()) + " " + photoList.get(i).getPicture());
-                }
-                gridViewAdapter.addToList(photoList);
-            }
-
-            @Override
-            public void onFailure(Call<ArrayList<Photo>> call, Throwable t) {
-
-            }
-        });
+        //serverManager = new ServerManager();
+        //serverManager.getPhotos();
 
         gridview = (GridView) findViewById(R.id.gv_main_page);
         gridview.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
@@ -108,7 +116,42 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
             public void onClick(View view) {
                 switch(currentMode) {
                     case PHOTO_MODE:
-                        Toast.makeText(MainPageActivity.this, "Taking Photo", Toast.LENGTH_SHORT).show();
+                        Call<TakePhotoResponse> makeRequest = retrofitAPI.takePhotoRequest();
+                        makeRequest.enqueue(new Callback<TakePhotoResponse>() {
+                            @Override
+                            public void onResponse(Call<TakePhotoResponse> call, Response<TakePhotoResponse> response) {
+                                requestData = response.body();
+                                if(requestData.getResponse().equals("OK")) {
+                                    try {
+                                        Thread.sleep(2000);
+                                        Call<ArrayList<Photo>> getPhotos = retrofitAPI.getPicturesList();
+                                        getPhotos.enqueue(new Callback<ArrayList<Photo>>() {
+                                            @Override
+                                            public void onResponse(Call<ArrayList<Photo>> call, Response<ArrayList<Photo>> response) {
+                                                photoList = response.body();
+                                                for(int i=0; i < photoList.size(); i++){
+                                                    Log.e("Message", String.valueOf(photoList.get(i).getId()) + " " + photoList.get(i).getPicture());
+                                                }
+                                                onGetPhotoResponse(photoList);
+                                            }
+
+                                            @Override
+                                            public void onFailure(Call<ArrayList<Photo>> call, Throwable t) {
+
+                                            }
+                                        });
+
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<TakePhotoResponse> call, Throwable t) {
+
+                            }
+                        });
                         break;
                     case BLUETOOTH_MODE:
                         Toast.makeText(MainPageActivity.this, "Searching Bluetooth", Toast.LENGTH_SHORT).show();
@@ -167,6 +210,26 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+
+            Toast.makeText(this, "Request sent", Toast.LENGTH_SHORT).show();
+
+            Call<ArrayList<Photo>> getPhotos = retrofitAPI.getPicturesList();
+            getPhotos.enqueue(new Callback<ArrayList<Photo>>() {
+                @Override
+                public void onResponse(Call<ArrayList<Photo>> call, Response<ArrayList<Photo>> response) {
+                    photoList = response.body();
+                    for(int i=0; i < photoList.size(); i++){
+                        Log.e("Message", String.valueOf(photoList.get(i).getId()) + " " + photoList.get(i).getPicture());
+                    }
+                    onGetPhotoResponse(photoList);
+                }
+
+                @Override
+                public void onFailure(Call<ArrayList<Photo>> call, Throwable t) {
+
+                }
+            });
+
             return true;
         }
 
@@ -196,4 +259,8 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
         }
     }
 
+    @Override
+    public void onGetPhotoResponse(ArrayList<Photo> photos) {
+
+    }
 }

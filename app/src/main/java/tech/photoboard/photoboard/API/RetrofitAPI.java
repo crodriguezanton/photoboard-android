@@ -18,15 +18,15 @@ import tech.photoboard.photoboard.Utils.User;
 public interface RetrofitAPI {
 
     @GET("/login/{user}")
-    Call<String> login(@Path("user") User user);
+    Call<String> login(@Path("user") User user) ;
 
     @GET("pictures")
 
     Call<ArrayList<Photo>> getPicturesList();
 
-    @GET("/takePhotoRequest/{device}")
+    @GET("/takePhotoRequest/")
 
-    Call<TakePhotoResponse> takePhotoRequest(@Path("device") String device);
+    Call<TakePhotoResponse> takePhotoRequest();
 
     @GET("/getPhotoRequest/{token}")
 

@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import tech.photoboard.photoboard.Photo;
 import tech.photoboard.photoboard.R;
 
 /**
