@@ -1,9 +1,7 @@
-package tech.photoboard.photoboard.Utils;
+package tech.photoboard.photoboard.CustomViews;
 
 import android.content.Context;
 import android.widget.GridView;
-
-import tech.photoboard.photoboard.Activities.MainPageActivity;
 
 /**
  * Created by pc1 on 23/10/2016.

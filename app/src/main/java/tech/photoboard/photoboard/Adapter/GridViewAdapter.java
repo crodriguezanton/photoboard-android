@@ -2,30 +2,21 @@ package tech.photoboard.photoboard.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Picture;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 
 
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONObject;
-
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
-import retrofit2.Retrofit;
 import tech.photoboard.photoboard.API.ApiClient;
 import tech.photoboard.photoboard.Activities.ImageViewerActivity;
-import tech.photoboard.photoboard.Photo;
-import tech.photoboard.photoboard.R;
-import tech.photoboard.photoboard.Utils.SquareImageView;
+import tech.photoboard.photoboard.Classes.Photo;
+import tech.photoboard.photoboard.CustomViews.SquareImageView;
 
 /**
  * Created by pc1 on 23/10/2016.
@@ -40,8 +31,6 @@ public class GridViewAdapter extends BaseAdapter {
         this.context = context;
         this.photoList = photoList;
     }
-
-
 
     @Override
     public int getCount() {
@@ -58,16 +47,16 @@ public class GridViewAdapter extends BaseAdapter {
         return position;
     }
 
-
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
 
         SquareImageView img;
+
         if(convertView == null) {
+
             img = new SquareImageView(context);
             convertView = img;
             img.setScaleType(SquareImageView.ScaleType.CENTER_CROP);
-
 
         } else {
 
@@ -91,20 +80,22 @@ public class GridViewAdapter extends BaseAdapter {
         });
 
         Picasso.with(context)
-                .load("http://10.180.16.62:8000" + photoList.get(position).getPicture())
+                .load(ApiClient.URL + photoList.get(position).getPicture())
                 .skipMemoryCache()
                 .noFade()
                 .into(img);
 
-
-
-
-
         return convertView;
     }
 
-    public void addToList(List<Photo> pictures){
+    public void updateList(List<Photo> pictures){
+        photoList.clear();
         photoList.addAll(pictures);
+        this.notifyDataSetChanged();
+    }
+
+    public void addPhotoToList(Photo picture){
+        photoList.add(picture);
         this.notifyDataSetChanged();
     }
 

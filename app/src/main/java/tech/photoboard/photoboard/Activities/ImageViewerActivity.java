@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 
 import tech.photoboard.photoboard.Adapter.FullScreenImageAdapter;
-import tech.photoboard.photoboard.Photo;
+import tech.photoboard.photoboard.Classes.Photo;
 import tech.photoboard.photoboard.R;
 
 /**
@@ -40,14 +40,17 @@ public class ImageViewerActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_viewer);
 
         imgSelected = getIntent().getIntExtra("POSITION",0);
+
         Gson gson = new Gson();
         Type type = new TypeToken<ArrayList<Photo>>(){}.getType();
         photoList =  gson.fromJson(getIntent().getStringExtra("FULLSCREEN_IMAGES"), type);
         adapter = new FullScreenImageAdapter(ImageViewerActivity.this,photoList);
+
         viewPager = (ViewPager) findViewById(R.id.vp_image_pager);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(imgSelected);
@@ -97,11 +100,13 @@ public class ImageViewerActivity extends Activity {
             }).start();
         }
         private void galleryAddPic(String mCurrentPhotoPath) {
+
             Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
             File f = new File(mCurrentPhotoPath);
             Uri contentUri = Uri.fromFile(f);
             mediaScanIntent.setData(contentUri);
             sendBroadcast(mediaScanIntent);
+
         }
         @Override
         public void onBitmapFailed(Drawable errorDrawable) {

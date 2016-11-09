@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,14 +19,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import tech.photoboard.photoboard.Photo;
 import tech.photoboard.photoboard.R;
 
 /**
@@ -35,13 +32,15 @@ import tech.photoboard.photoboard.R;
  */
 
 public class BluetoothListDialogFragment extends DialogFragment {
-    ListView devicesList;
-    Button btnSearch;
-    Button btnDismiss;
-    ArrayAdapter arrayAdapter;
-    List<String> arrayBluetooth;
-    HashMap<String, BluetoothDevice> mapBluetooth;
-    BluetoothAdapter bluetoothAdapter;
+
+    private ListView devicesList;
+    private Button btnSearch;
+    private Button btnDismiss;
+
+    private ArrayAdapter arrayAdapter;
+    private List<String> arrayBluetooth;
+    private HashMap<String, BluetoothDevice> mapBluetooth;
+    private BluetoothAdapter bluetoothAdapter;
     OnItemSelectedListener myItemSelectedListener;
     Context context;
 
@@ -60,9 +59,6 @@ public class BluetoothListDialogFragment extends DialogFragment {
     public void searchDevices (){
         //Start discovery
         bluetoothAdapter.startDiscovery();
-
-        //Get the paired devices
-        final Set<BluetoothDevice> bluetoothDevices = bluetoothAdapter.getBondedDevices();
         arrayBluetooth.clear();
 
         final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -82,7 +78,6 @@ public class BluetoothListDialogFragment extends DialogFragment {
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         context.registerReceiver(mReceiver, filter);
 
-
         //Display the Edison Devices
         devicesList.setAdapter(arrayAdapter);
 
@@ -91,15 +86,19 @@ public class BluetoothListDialogFragment extends DialogFragment {
     //Resize the Fragment
     @Override
     public void onResume() {
+
         // Store access variables for window and blank point
         Window window = getDialog().getWindow();
         Point size = new Point();
+
         // Store dimensions of the screen in `size`
         Display display = window.getWindowManager().getDefaultDisplay();
         display.getSize(size);
+
         // Set the width of the dialog proportional of the screen width and with height too
         window.setLayout((int) (size.x * 0.88), (int) (size.y * 0.83));
         window.setGravity(Gravity.CENTER);
+
         // Call super onResume after sizing
         super.onResume();
     }

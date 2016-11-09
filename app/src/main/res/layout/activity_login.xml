@@ -10,13 +10,15 @@
     android:paddingTop="@dimen/activity_vertical_margin">
 
     <Button
-        android:text="Button"
+        android:text="Log in"
+        android:background="@android:color/black"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/et_password_login"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="45dp"
-        android:id="@+id/btn_login" />
+        android:id="@+id/btn_login"
+        android:textColor="@android:color/background_light" />
 
     <EditText
         android:layout_width="match_parent"
@@ -27,15 +29,17 @@
         android:id="@+id/et_username_login"
         android:layout_centerVertical="true"
         android:layout_alignLeft="@+id/et_password_login"
-        android:layout_alignStart="@+id/et_password_login" />
+        android:layout_alignStart="@+id/et_password_login"
+        />
 
     <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="wrap_content"
+        android:layout_height="117dp"
         android:id="@+id/iv_login"
+        android:background="@drawable/logo_photoboard"
         android:layout_above="@+id/et_username_login"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="48dp" />
+        android:layout_marginBottom="25dp"/>
 
     <EditText
         android:layout_width="match_parent"

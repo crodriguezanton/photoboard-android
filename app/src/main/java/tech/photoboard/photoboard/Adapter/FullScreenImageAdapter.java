@@ -6,7 +6,6 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -14,8 +13,9 @@ import com.squareup.picasso.Picasso;
 import tech.photoboard.photoboard.*;
 import java.util.ArrayList;
 
+import tech.photoboard.photoboard.API.ApiClient;
 import tech.photoboard.photoboard.Activities.ImageViewerActivity;
-import tech.photoboard.photoboard.Photo;
+import tech.photoboard.photoboard.Classes.Photo;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
@@ -27,7 +27,6 @@ public class FullScreenImageAdapter extends PagerAdapter {
     private ImageViewerActivity activity;
     private LayoutInflater inflater;
     private ArrayList<Photo> photoList;
-    private ImageButton btnDownload;
 
     // constructor
     public FullScreenImageAdapter(ImageViewerActivity activity,
@@ -49,22 +48,19 @@ public class FullScreenImageAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, final int position) {
+
         ImageView imgDisplay;
 
-        inflater = (LayoutInflater) activity
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
+        inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View viewLayout = inflater.inflate(R.layout.adapter_fullscreen_image, container,false);
         imgDisplay = (ImageView) viewLayout.findViewById(R.id.iv_fullscreen_adapter);
+
         Picasso.with(activity)
-                .load("http://10.180.16.62:8000" + photoList.get(position).getPicture())
+                .load(ApiClient.URL + photoList.get(position).getPicture())
                 .into(imgDisplay);
         PhotoViewAttacher photoViewAttacher = new PhotoViewAttacher(imgDisplay);
 
         ((ViewPager) container).addView(viewLayout);
-
-
-
         return viewLayout;
     }
 

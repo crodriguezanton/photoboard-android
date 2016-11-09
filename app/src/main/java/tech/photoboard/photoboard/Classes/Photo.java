@@ -1,10 +1,11 @@
-package tech.photoboard.photoboard;
+package tech.photoboard.photoboard.Classes;
 
 /**
  * Created by pc1 on 23/10/2016.
  */
 
 public class Photo {
+
     private String picture;
     private int id;
 

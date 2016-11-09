@@ -1,4 +1,4 @@
-package tech.photoboard.photoboard.API;
+package tech.photoboard.photoboard.Classes;
 
 /**
  * Created by pc1 on 23/10/2016.
@@ -6,19 +6,19 @@ package tech.photoboard.photoboard.API;
 
 public class TakePhotoResponse {
 
-    String response;
+    boolean response;
     String id;
 
-    public TakePhotoResponse(String id, String response) {
+    public TakePhotoResponse(String id, boolean response) {
         this.id = id;
         this.response = response;
     }
 
-    public String getResponse() {
+    public boolean getResponse() {
         return response;
     }
 
-    public void setResponse(String response) {
+    public void setResponse(boolean response) {
         this.response = response;
     }
 
