@@ -4,22 +4,18 @@ package tech.photoboard.photoboard.Classes;
  * Created by pc1 on 23/10/2016.
  */
 
-public class TakePhotoResponse {
+public class TakePhotoResponse extends Response {
 
-    boolean response;
     String id;
 
-    public TakePhotoResponse(String id, boolean response) {
+    public TakePhotoResponse(boolean success, int error_code, String error, String id) {
+        super(success, error_code, error);
         this.id = id;
-        this.response = response;
     }
 
-    public boolean getResponse() {
-        return response;
-    }
-
-    public void setResponse(boolean response) {
-        this.response = response;
+    public TakePhotoResponse(boolean success, int error_code, String id) {
+        super(success, error_code);
+        this.id = id;
     }
 
     public String getId() {

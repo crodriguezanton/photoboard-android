@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import tech.photoboard.photoboard.Adapter.BluetoothListAdapter;
 import tech.photoboard.photoboard.R;
 
 /**
@@ -37,8 +38,8 @@ public class BluetoothListDialogFragment extends DialogFragment {
     private Button btnSearch;
     private Button btnDismiss;
 
-    private ArrayAdapter arrayAdapter;
-    private List<String> arrayBluetooth;
+    private BluetoothListAdapter arrayAdapter;
+    private ArrayList<String> arrayBluetooth;
     private HashMap<String, BluetoothDevice> mapBluetooth;
     private BluetoothAdapter bluetoothAdapter;
     OnItemSelectedListener myItemSelectedListener;
@@ -96,7 +97,7 @@ public class BluetoothListDialogFragment extends DialogFragment {
         display.getSize(size);
 
         // Set the width of the dialog proportional of the screen width and with height too
-        window.setLayout((int) (size.x * 0.88), (int) (size.y * 0.83));
+        window.setLayout((int) (size.x * 0.89), (int) (size.y * 0.78));
         window.setGravity(Gravity.CENTER);
 
         // Call super onResume after sizing
@@ -119,8 +120,7 @@ public class BluetoothListDialogFragment extends DialogFragment {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         arrayBluetooth = new ArrayList<>();
         mapBluetooth = new HashMap<>();
-        arrayAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, arrayBluetooth);
-
+        arrayAdapter = new BluetoothListAdapter(arrayBluetooth, getContext());
 
         searchDevices();
 

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -30,8 +31,8 @@ import tech.photoboard.photoboard.R;
 public class MainPageActivity extends AppCompatActivity implements BluetoothListDialogFragment.OnItemSelectedListener {
 
     public static final int BLUETOOTH_REQUEST_ENABLE = 1;
-    public static final int PHOTO_MODE = 10;
-    public static final int BLUETOOTH_MODE = 11;
+    public static final int PHOTO_MODE = 2502;
+    public static final int BLUETOOTH_MODE = 1991;
     final RetrofitAPI retrofitAPI = ApiClient.getClient().create(RetrofitAPI.class);
 
 
@@ -54,9 +55,10 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_page);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(R.drawable.btn_refresh);
-        toolbar.setNavigationIcon(R.drawable.icon_app_photoboard);
+        toolbar.setNavigationIcon(R.drawable.icon_photoboard);
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
 
         //Bluetooth
@@ -215,7 +217,7 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
             @Override
             public void onResponse(Call<TakePhotoResponse> call, Response<TakePhotoResponse> response) {
                 requestData = response.body();
-                if (requestData.getResponse()) {
+                if (requestData.isSuccess()) {
                     new Thread(new Worker(requestData.getId())).start();
                 }
             }

@@ -47,14 +47,17 @@ public class LoginActivity extends Activity {
                 String password = passwordEditText.getText().toString();
 
                 if(!email.isEmpty() && !password.isEmpty()) {
-                    //Retrofit
                     User user = new User(email,password);
-
-                    if(true/*loggIn(user)*/) {
+//loggIn(user)
+                    if(true) {
                         Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
                         startActivity(intent);
                         finish();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Incorrect username or password", Toast.LENGTH_SHORT);
                     }
+                } else {
+                    Toast.makeText(getApplicationContext(), "Introduce all the empty fields", Toast.LENGTH_SHORT);
                 }
             }
         });
@@ -65,17 +68,18 @@ public class LoginActivity extends Activity {
 
         logInSuccess = false;
 
-        Call<Boolean> logResponse = retrofitAPI.login(user);
-        logResponse.enqueue(new Callback<Boolean>() {
+        Call<tech.photoboard.photoboard.Classes.Response> logResponse = retrofitAPI.login(user);
+        logResponse.enqueue(new Callback<tech.photoboard.photoboard.Classes.Response>() {
 
             @Override
-            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
-                Boolean success = response.body();
+            public void onResponse(Call<tech.photoboard.photoboard.Classes.Response> call,
+                                   Response<tech.photoboard.photoboard.Classes.Response> response) {
+                Boolean success = response.body().isSuccess();
                 if(success) logInSuccess = true;
             }
 
             @Override
-            public void onFailure(Call<Boolean> call, Throwable t) {
+            public void onFailure(Call<tech.photoboard.photoboard.Classes.Response> call, Throwable t) {
                 Toast.makeText(LoginActivity.this,"Unreachable Server",Toast.LENGTH_SHORT);
             }
 
