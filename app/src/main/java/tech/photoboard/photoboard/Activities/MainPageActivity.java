@@ -56,19 +56,22 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_page);
 
+        //Inicializacion de la barra superior
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.icon_photoboard);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
 
         //Bluetooth
+        //Declaramos el boton de la pag. principal y lo ponemos en modo bluetooth
         btnTakePhoto = (FloatingActionButton) findViewById(R.id.btn_take_capture);
         btnTakePhoto.setImageResource(R.drawable.ic_btn_bluetooth);
         currentMode = BLUETOOTH_MODE;
+
         bluetoothDevice = null;
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        //GridView
+        //GridView: La galeria en si misma, el "conetenedor" de las fotos.
         photoList = new ArrayList<>();
         gridview = (GridView) findViewById(R.id.gv_main_page);
         gridview.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
@@ -78,13 +81,13 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
         //Update GridView
         getPhotosFromServer();
 
-        //Setting the functionality of the button
+        //Le damos funcionalidad al boton de captura de foto/ connexion bluetooth
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.btn_take_capture);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 switch (currentMode) {
-
+                    //Dependiendo del modo:
                     case PHOTO_MODE:
 
                         takePhotoRequest();
@@ -131,7 +134,8 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
         fab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-
+                //De momento, esto nos sirve para desconectarnos de la Edison en la que estemos
+                //Es decir, en modo foto, si mantenemos pulsado cambiamos a modo Bluetooth
                 if (currentMode == PHOTO_MODE) {
                     Toast.makeText(MainPageActivity.this, "Changed to Bluetooth Functionality", Toast.LENGTH_SHORT).show();
                     btnTakePhoto.setImageResource(R.drawable.ic_btn_bluetooth);
@@ -159,7 +163,7 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-
+            //Opcion actualizar del icono superior-derecha de la pagina principal
             getPhotosFromServer();
 
             return true;
@@ -186,6 +190,8 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
 
     @Override
     public void onItemSelected(BluetoothDevice bd) {
+        //Al seleccionar un dispositivos en la lista del Dialog, lo cogemos y cambiamos la
+        //funcionalidad del boton
         bluetoothDevice = bd;
         currentMode = PHOTO_MODE;
         btnTakePhoto.setImageResource(R.drawable.ic_btn_photo);
@@ -193,6 +199,7 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
     }
 
     public void getPhotosFromServer() {
+        //Utilizamos retroFit para hacer una peticion al servidor y esperamos respuesta
         Call<ArrayList<Photo>> getPhotos = retrofitAPI.getPicturesList();
         getPhotos.enqueue(new Callback<ArrayList<Photo>>() {
             @Override
@@ -212,12 +219,14 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
     }
 
     public void takePhotoRequest() {
+        //Pedimos foto y esperamos respuesta
         Call<TakePhotoResponse> takePhotoResponse = retrofitAPI.takePhotoRequest();
         takePhotoResponse.enqueue(new Callback<TakePhotoResponse>() {
             @Override
             public void onResponse(Call<TakePhotoResponse> call, Response<TakePhotoResponse> response) {
                 requestData = response.body();
                 if (requestData.isSuccess()) {
+                    //Si es afirmativa, creamos un Thread que espere para recibir la foto
                     new Thread(new Worker(requestData.getId())).start();
                 }
             }
@@ -227,29 +236,6 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
 
             }
         });
-    }
-
-    public boolean getPhotoRequest(String id) {
-
-        photoReceived = false;
-
-        Call<Photo> getPhotoResponse = retrofitAPI.getPhotoResquest(id);
-        getPhotoResponse.enqueue(new Callback<Photo>() {
-            @Override
-            public void onResponse(Call<Photo> call, Response<Photo> response) {
-                Photo photo = response.body();
-                if (photo != null) {
-                    photoReceived = true;
-                    gridViewAdapter.addPhotoToList(photo);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Photo> call, Throwable t) {
-
-            }
-        });
-        return photoReceived;
     }
 
     class Worker implements Runnable {
@@ -267,6 +253,7 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
             while (true) {
 
                 try {
+                    //Cada 250ms preguntamos al servidor si tiene ya la foto
                     die = getPhotoRequest(id);
                     if (die) break;
                     wait(250);
@@ -276,6 +263,29 @@ public class MainPageActivity extends AppCompatActivity implements BluetoothList
             }
 
         }
+    }
+    public boolean getPhotoRequest(String id) {
+
+        photoReceived = false;
+        //Pedimos la foto
+        Call<Photo> getPhotoResponse = retrofitAPI.getPhotoResquest(id);
+        getPhotoResponse.enqueue(new Callback<Photo>() {
+            @Override
+            public void onResponse(Call<Photo> call, Response<Photo> response) {
+                Photo photo = response.body();
+                //Si nos la envia, la añadimos a la lista.
+                if (photo != null) {
+                    photoReceived = true;
+                    gridViewAdapter.addPhotoToList(photo);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Photo> call, Throwable t) {
+
+            }
+        });
+        return photoReceived;
     }
 
 

@@ -22,6 +22,7 @@ import tech.photoboard.photoboard.CustomViews.SquareImageView;
  * Created by pc1 on 23/10/2016.
  */
 
+//Adaptador de la "galeria"
 public class GridViewAdapter extends BaseAdapter {
 
     private Context context;
@@ -67,7 +68,9 @@ public class GridViewAdapter extends BaseAdapter {
         img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Llama a la nueva actividad
+                //En caso de hacer click en una imagen, se abre el visor, la actividad
+                //ImageViewerActivity, le tenemos que pasar las fotos, y la posicion
+                //de la foto seleccionada.
 
                 Intent intent = new Intent(context, ImageViewerActivity.class);
                 Gson gson = new Gson();
@@ -78,7 +81,7 @@ public class GridViewAdapter extends BaseAdapter {
 
             }
         });
-
+        //Establecemos la imagen de cada view de la gridview
         Picasso.with(context)
                 .load(ApiClient.URL + photoList.get(position).getPicture())
                 .skipMemoryCache()

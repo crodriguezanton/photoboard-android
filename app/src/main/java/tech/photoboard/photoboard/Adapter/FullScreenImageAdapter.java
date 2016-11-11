@@ -24,6 +24,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class FullScreenImageAdapter extends PagerAdapter {
 
+    //Esta clase es el adaptador del visor de imagenes.
     private ImageViewerActivity activity;
     private LayoutInflater inflater;
     private ArrayList<Photo> photoList;
@@ -50,14 +51,15 @@ public class FullScreenImageAdapter extends PagerAdapter {
     public Object instantiateItem(ViewGroup container, final int position) {
 
         ImageView imgDisplay;
-
+        //Inflamos el adaptador y inicializamos la imgDisplay
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View viewLayout = inflater.inflate(R.layout.adapter_fullscreen_image, container,false);
         imgDisplay = (ImageView) viewLayout.findViewById(R.id.iv_fullscreen_adapter);
-
+        //Metemos en imgDisplay la imagen que corresponde a la posicion actual
         Picasso.with(activity)
                 .load(ApiClient.URL + photoList.get(position).getPicture())
                 .into(imgDisplay);
+        //Creamos un PhotoViewAttacher, que nos permite hacer zoom (esta clase es importada de librerias)
         PhotoViewAttacher photoViewAttacher = new PhotoViewAttacher(imgDisplay);
 
         ((ViewPager) container).addView(viewLayout);
