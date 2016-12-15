@@ -68,10 +68,10 @@ public class BluetoothListDialogFragment extends DialogFragment {
                 String action = intent.getAction();
                 if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    if (true) {
-                        arrayBluetooth.add(device.getName() + "\n" + device.getAddress());
-                        mapBluetooth.put(device.getName(), device);
-                        arrayAdapter.notifyDataSetChanged();
+                    if (true && !mapBluetooth.containsValue(device)) {
+                            arrayBluetooth.add(device.getName() + "\n" + device.getAddress());
+                            mapBluetooth.put(device.getName(), device);
+                            arrayAdapter.notifyDataSetChanged();
                     }
                 }
             }

@@ -10,6 +10,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 import tech.photoboard.photoboard.Classes.Photo;
 import tech.photoboard.photoboard.Classes.Response;
+import tech.photoboard.photoboard.Classes.Subject;
 import tech.photoboard.photoboard.Classes.TakePhotoResponse;
 import tech.photoboard.photoboard.Classes.User;
 
@@ -19,7 +20,7 @@ import tech.photoboard.photoboard.Classes.User;
 
 public interface RetrofitAPI {
 
-    @POST("/login/")
+    @POST("/login")
 
     Call<Response> login(@Body User user) ;
 
@@ -27,13 +28,21 @@ public interface RetrofitAPI {
 
     Call<ArrayList<Photo>> getPicturesList();
 
-    @GET("/takephoto")
+    @POST("/takephoto")
 
-    Call<TakePhotoResponse> takePhotoRequest();
+    Call<TakePhotoResponse> takePhotoRequest(@Body int id);
 
     @GET("/poolphoto/{id}")
 
     Call<Photo> getPhotoResquest(@Path("id") String id);
+
+    @GET("/subjects")
+
+    Call<ArrayList<Subject>> getSubjectsList();
+
+    @GET("/subjectgallery/{id}")
+
+    Call<ArrayList<Photo>> getSubjectPhotos(@Path("id") int id);
 
 
 }

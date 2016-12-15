@@ -7,6 +7,7 @@ import android.widget.GridView;
  * Created by pc1 on 23/10/2016.
  */
 
+//Esta clase de momento no la usamos
 public class CustomGridView extends GridView {
     public CustomGridView(Context context) {
         super(context);
