@@ -3,16 +3,38 @@
     android:id="@+id/lv_item_background"
     android:orientation="horizontal"
     android:layout_width="match_parent"
+<<<<<<< HEAD
     android:layout_height="125dp"
     android:padding="5dp">
+=======
+    android:layout_height="70dp"
+    android:padding="5dp">
+    <RelativeLayout
+        android:layout_weight="3"
+        android:layout_width="0dp"
+        android:layout_height="70dp"
+        android:gravity="center">
+        <ImageView
+            android:id="@+id/iv_subject_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"/>
+    </RelativeLayout>
+>>>>>>> origin/master
 
     <TextView
         android:id="@+id/subject_name"
         android:layout_weight="7"
+<<<<<<< HEAD
         android:layout_width="match_parent"
         android:layout_height="75dp"
         android:layout_gravity="center_vertical"
         android:gravity="center"
+=======
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+>>>>>>> origin/master
         android:textSize="30sp"
 
         />

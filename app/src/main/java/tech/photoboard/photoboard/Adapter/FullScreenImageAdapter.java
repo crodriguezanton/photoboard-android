@@ -68,7 +68,7 @@ public class FullScreenImageAdapter extends PagerAdapter {
 
         //Metemos en imgDisplay la imagen que corresponde a la posicion actual
         Picasso.with(activity)
-                .load(ApiClient.URL + photoList.get(position).getPicture())
+                .load(/*ApiClient.URL + */photoList.get(position).getPicture())
                 .into(imgDisplay);
         //Creamos un PhotoViewAttacher, que nos permite hacer zoom (esta clase es importada de librerias)
         PhotoViewAttacher photoViewAttacher = new PhotoViewAttacher(imgDisplay);
