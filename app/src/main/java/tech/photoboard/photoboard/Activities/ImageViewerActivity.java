@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -22,6 +23,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 
+import tech.photoboard.photoboard.API.ApiClient;
 import tech.photoboard.photoboard.Adapter.FullScreenImageAdapter;
 import tech.photoboard.photoboard.Classes.Photo;
 import tech.photoboard.photoboard.R;
@@ -41,44 +43,108 @@ public class ImageViewerActivity extends Activity {
      * la posicion de la foto seleccionada y el boton de descarga
      */
 
+
     private ArrayList<Photo> photoList;
     private FullScreenImageAdapter adapter;
     private ViewPager viewPager;
     private int imgSelected;
     private ImageButton btnDownload;
+    private ImageButton btnFavorite;
+    private String actualSubject;
+    private MySPHelper mySPHelper;
+    private boolean actualPhotoFavorite;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_viewer);
+        mySPHelper = new MySPHelper(this);
         //Recogemos informacion de la actividad desde donde se llama a esta:
-        imgSelected = getIntent().getIntExtra("POSITION",0);
+        imgSelected = getIntent().getIntExtra("POSITION", 0);
 
         //Cogemos la lista del Intent y la añadimos al adaptador.
         Gson gson = new Gson();
-        Type type = new TypeToken<ArrayList<Photo>>(){}.getType();
-        photoList =  gson.fromJson(getIntent().getStringExtra("FULLSCREEN_IMAGES"), type);
-        adapter = new FullScreenImageAdapter(ImageViewerActivity.this,photoList);
+        Type type = new TypeToken<ArrayList<Photo>>() {
+        }.getType();
+        photoList = gson.fromJson(getIntent().getStringExtra("FULLSCREEN_IMAGES"), type);
+        adapter = new FullScreenImageAdapter(ImageViewerActivity.this, photoList);
 
         //Creamos el viewPager con el adaptador de antes.
         viewPager = (ViewPager) findViewById(R.id.vp_image_pager);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                ArrayList<String> favPhotos = mySPHelper.getFavPhotos(mySPHelper.getCurrentSubject());
+                if(favPhotos!= null && favPhotos.contains(""+photoList.get(position).getId())) {
+                    Log.i("FavList contains",""+photoList.get(position).getId());
+                    actualPhotoFavorite = true;
+                    btnFavorite.setBackgroundResource(R.drawable.ic_red_star);
+                } else  {
+                    Log.i("FavList NOT contains",""+position);
+                    actualPhotoFavorite = false;
+                    btnFavorite.setBackgroundResource(R.drawable.ic_white_star);
+                }
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         viewPager.setAdapter(adapter);
+
         //Seleccionamos la posicion deseada.
         viewPager.setCurrentItem(imgSelected);
+
         //Declaramos el boton de descarga y su funcionalidad
         btnDownload = (ImageButton) findViewById(R.id.btn_download_image);
         btnDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Picasso.with(ImageViewerActivity.this)
-                        .load(photoList.get(viewPager.getCurrentItem()).getPicture())
+                        .load(ApiClient.URL + photoList.get(viewPager.getCurrentItem()).getPicture())
                         .skipMemoryCache()
                         .noFade()
                         .into(target);
             }
         });
+        /*Adding photo to favorites*/
+        btnFavorite = (ImageButton) findViewById(R.id.btn_add_favorite);
+        btnFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<String> favPhotos = new ArrayList<String>();
+                if (mySPHelper.getFavPhotos(mySPHelper.getCurrentSubject())!=null) {
+                    favPhotos = mySPHelper.getFavPhotos(mySPHelper.getCurrentSubject());
+                }
+                if(!actualPhotoFavorite) {
+                    actualPhotoFavorite = true;
+                    btnFavorite.setBackgroundResource(R.drawable.ic_red_star);
+                    favPhotos.add(""+photoList.get(viewPager.getCurrentItem()).getId());
 
+                    for(String s: favPhotos) {
+                        Log.i("Message", s);
+                    }
+                    mySPHelper.setFavPhotos(favPhotos);
+                } else {
+                    /*Eliminar de favorito*/
+                    actualPhotoFavorite = false;
+                    btnFavorite.setBackgroundResource(R.drawable.ic_white_star);
+                    favPhotos.remove(""+photoList.get(viewPager.getCurrentItem()).getId());
+                    mySPHelper.setFavPhotos(favPhotos);
+                }
+
+
+            }
+        });
     }
     //Target nos sirve para guardar la foto en la SD
     private Target target = new Target() {
@@ -87,15 +153,19 @@ public class ImageViewerActivity extends Activity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+
                     //Se crea una carpeta en el movil en caso de que no existiera.
                     File folder = new File(Environment.getExternalStoragePublicDirectory(
                             Environment.DIRECTORY_PICTURES), "Photoboard");
+                    File subfolder = new File(Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_PICTURES)+"/Photoboard",mySPHelper.getCurrentSubject());
                     folder.mkdirs();
+                    subfolder.mkdirs();
                     String url =  photoList.get(viewPager.getCurrentItem()).getPicture();
                     if(url == null) return;
                     String name = url.substring(url.lastIndexOf("/")+1);
                     //declaramos un archivo con el nombre de la foto y la direccion.
-                    File file = new File(folder, name);
+                    File file = new File(subfolder, name);
                     String finalPath = file.getAbsolutePath();
                     try
                     {
@@ -138,4 +208,3 @@ public class ImageViewerActivity extends Activity {
     };
 
 }
-//ELIAS SUBNORMAL

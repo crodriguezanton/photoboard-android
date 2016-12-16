@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class ApiClient {
-    public static final String URL = "http://photoboard.zapto.org";
+    public static final String URL = "http://photoboard.tech";
     public static final String BASE_URL = URL + "/api/";
     private static Retrofit retrofit = null;
 

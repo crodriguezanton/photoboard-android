@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_fav"
+            android:icon="@drawable/ic_red_star"
+            android:title="Favorites" />
+        <item
+            android:id="@+id/nav_camera"
+            android:icon="@drawable/ic_webshield"
+            android:title="Atenea" />
+        <item
+            android:id="@+id/nav_git_hub"
+            android:icon="@drawable/ic_git_hub"
+            android:title="Git Hub Repository" />
+
+
+    </group>
+
+    <item android:title="Account">
+        <menu>
+            <item
+                android:id="@+id/nav_log_out"
+                android:icon="@drawable/ic_log_out"
+                android:title="Log Out" />
+        </menu>
+    </item>
+
+</menu>

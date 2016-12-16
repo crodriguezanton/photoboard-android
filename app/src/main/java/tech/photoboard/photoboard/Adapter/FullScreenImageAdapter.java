@@ -3,11 +3,14 @@ package tech.photoboard.photoboard.Adapter;
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import tech.photoboard.photoboard.*;
@@ -15,6 +18,7 @@ import java.util.ArrayList;
 
 import tech.photoboard.photoboard.API.ApiClient;
 import tech.photoboard.photoboard.Activities.ImageViewerActivity;
+import tech.photoboard.photoboard.Activities.MySPHelper;
 import tech.photoboard.photoboard.Classes.Photo;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -28,12 +32,16 @@ public class FullScreenImageAdapter extends PagerAdapter {
     private ImageViewerActivity activity;
     private LayoutInflater inflater;
     private ArrayList<Photo> photoList;
+    private MySPHelper mySPHelper;
+
+    private ImageButton btnFavorite;
 
     // constructor
     public FullScreenImageAdapter(ImageViewerActivity activity,
                                   ArrayList<Photo> photoList) {
         super();
         this.activity = activity;
+        this.mySPHelper = new MySPHelper(activity);
         this.photoList = photoList;
     }
 
@@ -55,13 +63,16 @@ public class FullScreenImageAdapter extends PagerAdapter {
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View viewLayout = inflater.inflate(R.layout.adapter_fullscreen_image, container,false);
         imgDisplay = (ImageView) viewLayout.findViewById(R.id.iv_fullscreen_adapter);
+
+
+
         //Metemos en imgDisplay la imagen que corresponde a la posicion actual
         Picasso.with(activity)
                 .load(ApiClient.URL + photoList.get(position).getPicture())
                 .into(imgDisplay);
         //Creamos un PhotoViewAttacher, que nos permite hacer zoom (esta clase es importada de librerias)
         PhotoViewAttacher photoViewAttacher = new PhotoViewAttacher(imgDisplay);
-
+        photoViewAttacher.update();
         ((ViewPager) container).addView(viewLayout);
         return viewLayout;
     }

@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import tech.photoboard.photoboard.Activities.MainPageActivity;
 import tech.photoboard.photoboard.R;
 
 /**
