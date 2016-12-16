@@ -13,8 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,7 +21,6 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,8 +28,11 @@ import retrofit2.Response;
 import tech.photoboard.photoboard.API.ApiClient;
 import tech.photoboard.photoboard.API.RetrofitAPI;
 import tech.photoboard.photoboard.Activities.BluetoothListDialogFragment;
+import tech.photoboard.photoboard.Activities.MySPHelper;
 import tech.photoboard.photoboard.Adapter.GridViewAdapter;
 import tech.photoboard.photoboard.Classes.Photo;
+import tech.photoboard.photoboard.Classes.PhotoPool;
+import tech.photoboard.photoboard.Classes.PictureGallery;
 import tech.photoboard.photoboard.Classes.Subject;
 import tech.photoboard.photoboard.Classes.TakePhotoResponse;
 import tech.photoboard.photoboard.R;
@@ -63,10 +63,11 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
     BluetoothDevice bluetoothDevice;
 
     boolean photoReceived;
+    private MySPHelper mySPHelper;
 
     private Subject subject;
     private static final String SUBJECT_KEY = "subject_key";
-    /*private String photos[] = {"http://www.computus.org/wp/wp-content/uploads/2009/02/rees-l.jpg",
+    private String photos[] = {"http://www.computus.org/wp/wp-content/uploads/2009/02/rees-l.jpg",
             "http://previews.123rf.com/images/nexusplexus/nexusplexus1210/nexusplexus121000372/15597956-Personas-de-negocios-de-pie-contra-la-pizarra-con-una-gran-cantidad-de-datos-escrito-en-l-Foto-de-archivo.jpg",
             "http://img00.deviantart.net/f805/i/2010/141/9/a/highschool_blackboard_by_peanut28.jpg",
             "https://whatsonmyblackboard.files.wordpress.com/2015/10/commonroomsept2015.jpg",
@@ -75,7 +76,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
             "http://img00.deviantart.net/f805/i/2010/141/9/a/highschool_blackboard_by_peanut28.jpg",
             "https://whatsonmyblackboard.files.wordpress.com/2015/10/commonroomsept2015.jpg",
             "http://previews.123rf.com/images/nexusplexus/nexusplexus1210/nexusplexus121000372/15597956-Personas-de-negocios-de-pie-contra-la-pizarra-con-una-gran-cantidad-de-datos-escrito-en-l-Foto-de-archivo.jpg"};
-    */
+
 
 
     public static GalleryFragment newInstance(Subject subject) {
@@ -84,7 +85,6 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
         Gson gson = new Gson();
         bundle.putSerializable(SUBJECT_KEY, gson.toJson(subject));
         fragment.setArguments(bundle);
-
         return fragment;
     }
     @Override
@@ -92,12 +92,13 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_prueba, container, false);
+        mySPHelper = new MySPHelper(getActivity());
         /*Getting subject from bundle*/
         Gson gson = new Gson();
         Type type = new TypeToken<Subject>() {}.getType();
         subject = gson.fromJson((String) getArguments().getSerializable(SUBJECT_KEY) ,type);
         setSubjectStyle();
-        ;
+
 
         /*Setting the gallery*/
         photoList = new ArrayList<>();
@@ -107,14 +108,16 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
 
         /*Update GridView*/
         getPhotosFromServer();
-
-        /*ArrayList<String> urls = new ArrayList( Arrays.asList(photos) );
+/*
+        ArrayList<String> urls = new ArrayList( Arrays.asList(photos) );
         ArrayList<Photo> newPhotos = new ArrayList<>();
+        int iterator = 0;
         for(String s: urls) {
-            newPhotos.add(new Photo(s,1));
+            newPhotos.add(new Photo(s,iterator));
+            iterator++;
         }
-        gridViewAdapter.updateList(newPhotos);
-        */
+        gridViewAdapter.updateList(newPhotos);*/
+
 
         /*Setting the fab button*/
         btnTakePhoto = (FloatingActionButton) view.findViewById(R.id.fab_take_capture);
@@ -228,7 +231,6 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
             @Override
             public void onFailure(Call<TakePhotoResponse> call, Throwable t) {
                 btnTakePhoto.setEnabled(true);
-                Toast.makeText(getActivity().getApplicationContext(),"Unreachable server.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -250,7 +252,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
                     //Cada 250ms preguntamos al servidor si tiene ya la foto
                     die = getPhotoRequest(id);
                     if (die) break;
-                    wait(250);
+                    wait(1000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -259,11 +261,12 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
         }
     }
     public void getPhotosFromServer() {
-        Call<ArrayList<Photo>> getPhotos = retrofitAPI.getSubjectPhotos(subject.getId());
-        getPhotos.enqueue(new Callback<ArrayList<Photo>>() {
+        Call<PictureGallery> getPhotos = retrofitAPI.getSubjectPhotos(subject.getId());
+        getPhotos.enqueue(new Callback<PictureGallery>() {
             @Override
-            public void onResponse(Call<ArrayList<Photo>> call, Response<ArrayList<Photo>> response) {
-                photoList = response.body();
+            public void onResponse(Call<PictureGallery> call, Response<PictureGallery> response) {
+                PictureGallery photoGallery = response.body();
+                photoList = photoGallery.getPictures();
                 for (int i = 0; i < photoList.size(); i++) {
                     Log.e("Message", String.valueOf(photoList.get(i).getId()) + " " + photoList.get(i).getPicture());
                 }
@@ -271,8 +274,8 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
             }
 
             @Override
-            public void onFailure(Call<ArrayList<Photo>> call, Throwable t) {
-                Toast.makeText(getActivity().getApplicationContext(),"Unreachable server.", Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<PictureGallery> call, Throwable t) {
+
             }
         });
     }
@@ -280,21 +283,21 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
 
         photoReceived = false;
         //Pedimos la foto
-        Call<Photo> getPhotoResponse = retrofitAPI.getPhotoResquest(id);
-        getPhotoResponse.enqueue(new Callback<Photo>() {
+        Call<PhotoPool> getPhotoResponse = retrofitAPI.getPhotoResquest(id);
+        getPhotoResponse.enqueue(new Callback<PhotoPool>() {
             @Override
-            public void onResponse(Call<Photo> call, Response<Photo> response) {
-                Photo photo = response.body();
+            public void onResponse(Call<PhotoPool> call, Response<PhotoPool> response) {
+                PhotoPool photo = response.body();
                 //Si nos la envia, la añadimos a la lista.
-                if (photo != null) {
+                if (photo.getPicture() != null) {
                     photoReceived = true;
-                    gridViewAdapter.addPhotoToList(photo);
+                    gridViewAdapter.addPhotoToList(photo.getPicture());
                 }
             }
 
             @Override
-            public void onFailure(Call<Photo> call, Throwable t) {
-                Toast.makeText(getActivity().getApplicationContext(),"Unreachable server.", Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<PhotoPool> call, Throwable t) {
+
             }
         });
         return photoReceived;
@@ -303,39 +306,29 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
     private void setSubjectStyle() {
         NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
         View hView =  navigationView.getHeaderView(0);
-        LinearLayout background = (LinearLayout) hView.findViewById(R.id.nav_bar_header_background);
-        ImageView icon = (ImageView) hView.findViewById(R.id.nav_bar_header_icon);
         TextView name = (TextView) hView.findViewById(R.id.nav_bar_header_name);
         name.setText(subject.getName());
-        switch (subject.getGroup()) {
-            case "PHYSICS":
-                //background.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPhysics));
-                background.setBackgroundResource(R.drawable.background_physics);
-                icon.setImageResource(R.drawable.ic_physics);
-                break;
-            case "AUDIO-VIDEO":
-                //background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAudioVideo));
-                background.setBackgroundResource(R.drawable.background_audio_video);
-                icon.setImageResource(R.drawable.ic_audio_video);
-                break;
-            case "PROJECT":
-                //background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorProject));
-                background.setBackgroundResource(R.drawable.background_project);
-                icon.setImageResource(R.drawable.ic_project);
-                break;
-            case "ELECTRONICS":
-                //background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorElectronics));
-                background.setBackgroundResource(R.drawable.background_electronics);
-                icon.setImageResource(R.drawable.ic_electronics);
-                break;
-            case "PROGRAMMING":
-                //background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorProgramming));
-                background.setBackgroundResource(R.drawable.background_programming);
-                icon.setImageResource(R.drawable.ic_programming);
-                break;
-            default:
-                break;
+
+    }
+    public void filterFavorites() {
+        ArrayList<Photo> filteredPhotos = new ArrayList<>();
+        ArrayList<String> favPhotos = new ArrayList<>();
+        String actualSubject = mySPHelper.getCurrentSubject();
+        if (actualSubject == null)  {
+            Toast.makeText(getActivity(), "No subject selected.", Toast.LENGTH_SHORT).show();
+            return;
         }
+        favPhotos = mySPHelper.getFavPhotos(actualSubject);
+        if(favPhotos == null) {
+            Toast.makeText(getActivity(), "No favorites added.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        for(Photo photo: photoList) {
+            if(favPhotos.contains("" + photo.getId())) {
+                filteredPhotos.add(photo);
+            }
+        }
+        gridViewAdapter.updateList(filteredPhotos);
     }
 
 }

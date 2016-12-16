@@ -50,36 +50,19 @@ public class SubjectsListAdapter extends BaseAdapter {
         View v = convertView;
         TextView subjectTextView;
         LinearLayout background;
-<<<<<<< HEAD
-=======
-        ImageView subjectIcon;
->>>>>>> origin/master
         if(v  == null) {
             v= LayoutInflater.from(context).inflate(R.layout.adapter_subjects_list,null);
         }
 
         subjectTextView = (TextView) v.findViewById(R.id.subject_name);
-<<<<<<< HEAD
         background = (LinearLayout) v.findViewById(R.id.lv_item_background);
 
         background.setBackgroundResource(R.color.colorProgramming);
 
-=======
-        subjectIcon = (ImageView) v.findViewById(R.id.iv_subject_icon);
-        background = (LinearLayout) v.findViewById(R.id.lv_item_background);
-
->>>>>>> origin/master
         String subjectName = subjects.get(position).getName();
         if( subjectName!= null) {
             subjectTextView.setText(subjects.get(position).getName());
         } else subjectTextView.setText("Null");
-<<<<<<< HEAD
-=======
-        if (subjects.get(position).getGroup()!=null){
-            setSubjectStyle(subjects.get(position).getGroup(), subjectIcon, background);
-        }
-
->>>>>>> origin/master
 
         background.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,40 +80,6 @@ public class SubjectsListAdapter extends BaseAdapter {
         return v;
     }
 
-<<<<<<< HEAD
-=======
-    private void setSubjectStyle(String area, ImageView subjectIcon, LinearLayout background) {
-        switch (area) {
-            case "PHYSICS":
-                subjectIcon.setImageResource(R.drawable.ic_physics_black);
-                background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPhysics));
-                //background.setBackgroundResource(R.drawable.background_physics);
-                break;
-            case "AUDIO-VIDEO":
-                subjectIcon.setImageResource(R.drawable.ic_audio_video_black);
-                background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorAudioVideo));
-                //background.setBackgroundResource(R.drawable.background_audio_video);
-                break;
-            case "PROJECT":
-                subjectIcon.setImageResource(R.drawable.ic_project_black);
-                background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorProject));
-                //background.setBackgroundResource(R.drawable.background_project);
-                break;
-            case "ELECTRONICS":
-                subjectIcon.setImageResource(R.drawable.ic_electronics_black);
-                background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorElectronics));
-                //background.setBackgroundResource(R.drawable.background_electronics);
-                break;
-            case "PROGRAMMING":
-                subjectIcon.setImageResource(R.drawable.ic_programming_black);
-                background.setBackgroundColor(ContextCompat.getColor(context, R.color.colorProgramming));
-                //background.setBackgroundResource(R.drawable.background_programming);
-                break;
-            default:
-                break;
-        }
-    }
->>>>>>> origin/master
 
     public interface SubjectsGalleryManager {
         void openGallery(Subject subject);

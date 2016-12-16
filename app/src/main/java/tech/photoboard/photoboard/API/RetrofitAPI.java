@@ -22,20 +22,12 @@ import tech.photoboard.photoboard.Classes.User;
 public interface RetrofitAPI {
 
     @POST("/login")
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/master
     Call<Response> login(@Body User user) ;
 
     @GET("/pictures")
     Call<ArrayList<Photo>> getPicturesList();
 
     @POST("/takephoto")
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/master
     Call<TakePhotoResponse> takePhotoRequest(@Body int id);
 
     @GET("/poolphoto/{id}")
@@ -46,14 +38,6 @@ public interface RetrofitAPI {
 
     @GET("/subjectgallery/{id}")
     Call<PictureGallery> getSubjectPhotos(@Path("id") int id);
-
-    @GET("/subjects")
-
-    Call<ArrayList<Subject>> getSubjectsList();
-
-    @GET("/subjectgallery/{id}")
-
-    Call<ArrayList<Photo>> getSubjectPhotos(@Path("id") int id);
 
 
 }

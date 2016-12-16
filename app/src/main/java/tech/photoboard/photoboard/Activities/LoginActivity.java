@@ -5,10 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-<<<<<<< HEAD
 import android.util.Log;
-=======
->>>>>>> origin/master
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,20 +29,12 @@ public class LoginActivity extends Activity {
 
     final RetrofitAPI retrofitAPI = ApiClient.getClient().create(RetrofitAPI.class);
 
-    static final String LOGGED_IN = "LOGGED_IN";
-    public static final String USER = "USER";
-
     private EditText emailEditText;
     private EditText passwordEditText;
     private Button loginButton;
 
     private User user = new User();
-<<<<<<< HEAD
     private MySPHelper mySPHelper;
-=======
-    private SharedPreferences sharedPreferences;
-    private  SharedPreferences.Editor editor;
->>>>>>> origin/master
 
 
     @Override
@@ -54,19 +43,6 @@ public class LoginActivity extends Activity {
 
         /*Checking if we are already logged in*/
 
-<<<<<<< HEAD
-=======
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        editor = sharedPreferences.edit();
-
-        String loggedIn = sharedPreferences.getString(LOGGED_IN,null);
-        if(loggedIn!=null&&loggedIn.equals(LOGGED_IN)) {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
-            finish();
-        };
-
->>>>>>> origin/master
         setContentView(R.layout.activity_login);
 
         mySPHelper = new MySPHelper(this);
@@ -127,16 +103,8 @@ public class LoginActivity extends Activity {
     }
 
     public void newActivity() {
-<<<<<<< HEAD
         mySPHelper.setLoggedIn(true);
         mySPHelper.setUser(user);
-=======
-        editor.putString(LOGGED_IN, LOGGED_IN);
-        Gson gson = new Gson();
-        String json = gson.toJson(user);
-        editor.putString(USER,json);
-        editor.commit();
->>>>>>> origin/master
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
         finish();
