@@ -21,6 +21,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -91,7 +92,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_prueba, container, false);
+        View view = inflater.inflate(R.layout.fragment_gallery, container, false);
         mySPHelper = new MySPHelper(getActivity());
         /*Getting subject from bundle*/
         Gson gson = new Gson();
@@ -108,7 +109,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
 
         /*Update GridView*/
         getPhotosFromServer();
-/*
+
         ArrayList<String> urls = new ArrayList( Arrays.asList(photos) );
         ArrayList<Photo> newPhotos = new ArrayList<>();
         int iterator = 0;
@@ -116,7 +117,9 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
             newPhotos.add(new Photo(s,iterator));
             iterator++;
         }
-        gridViewAdapter.updateList(newPhotos);*/
+        photoList = newPhotos;
+        filterFavorites(mySPHelper.getFavMode());
+
 
 
         /*Setting the fab button*/
@@ -310,25 +313,25 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
         name.setText(subject.getName());
 
     }
-    public void filterFavorites() {
-        ArrayList<Photo> filteredPhotos = new ArrayList<>();
-        ArrayList<String> favPhotos = new ArrayList<>();
-        String actualSubject = mySPHelper.getCurrentSubject();
-        if (actualSubject == null)  {
-            Toast.makeText(getActivity(), "No subject selected.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        favPhotos = mySPHelper.getFavPhotos(actualSubject);
-        if(favPhotos == null) {
-            Toast.makeText(getActivity(), "No favorites added.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        for(Photo photo: photoList) {
-            if(favPhotos.contains("" + photo.getId())) {
-                filteredPhotos.add(photo);
+    public void filterFavorites(boolean favMode) {
+        if(favMode) {
+            ArrayList<Photo> filteredPhotos = new ArrayList<>();
+            ArrayList<String> favPhotos = new ArrayList<>();
+            String actualSubject = mySPHelper.getCurrentSubject();
+            favPhotos = mySPHelper.getFavPhotos(actualSubject);
+            if(favPhotos == null) {
+                Toast.makeText(getActivity(), "No favorites added.", Toast.LENGTH_SHORT).show();
+                return;
             }
-        }
-        gridViewAdapter.updateList(filteredPhotos);
+            for(Photo photo: photoList) {
+                if(favPhotos.contains("" + photo.getId())) {
+                    filteredPhotos.add(photo);
+                }
+            }
+            gridViewAdapter.updateList(filteredPhotos);
+        } else gridViewAdapter.updateList(photoList);
+
     }
+
 
 }

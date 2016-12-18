@@ -48,8 +48,6 @@ public class MainActivity extends AppCompatActivity
 {
 
     public static final String SUBJECTS_LIST = "SUBJECT_LIST";
-    public static final String SUBJECT_ID = "SUBJECT_ID";
-
     private SubjectFragment subjectFragment;
     private GalleryFragment galleryFragment;
     final RetrofitAPI retrofitAPI = ApiClient.getClient().create(RetrofitAPI.class);
@@ -66,6 +64,15 @@ public class MainActivity extends AppCompatActivity
         user = mySPHelper.getUser();
         createSubjectListFragment();
         setAppBarContent();
+
+    }
+    @Override
+
+    protected void onResume() {
+        super.onResume();
+        if(galleryFragment!=null && mySPHelper.getFavMode()) {
+            galleryFragment.filterFavorites(mySPHelper.getFavMode());
+        }
 
     }
 
@@ -89,11 +96,12 @@ public class MainActivity extends AppCompatActivity
     private void createSubjectListFragment() {
         subjects = new ArrayList<>();
         getSubjectsFromServer();
-        /*subjects.add(new Subject(0,"PSAVC", "AUDIO-VIDEO"));
+        subjects.add(new Subject(0,"PSAVC", "AUDIO-VIDEO"));
         subjects.add(new Subject(0, "RP","PHYSICS"));
         subjects.add(new Subject(0,"PBE", "PROJECT"));
         subjects.add(new Subject(0, "TD", "PROGRAMMING"));
-        subjects.add(new Subject(0, "DSBM","ELECTRONICS"));*/
+        subjects.add(new Subject(0, "DSBM","ELECTRONICS"));
+
 
         /*Saving subjects in sharedpreferences*/
         /*This is done in order to pass the subjects to the fragment*/
@@ -127,18 +135,21 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        setNavigationHeaderStyle(navigationView);
         navigationView.setNavigationItemSelectedListener(this);
+        setNavigationHeaderStyle(navigationView);
 
     }
 
     public void setNavigationHeaderStyle( NavigationView navigationView) {
         View hView =  navigationView.getHeaderView(0);
+        Menu menu = navigationView.getMenu();
         LinearLayout background = (LinearLayout) hView.findViewById(R.id.nav_bar_header_background);
         TextView name = (TextView) hView.findViewById(R.id.nav_bar_header_name);
         TextView userName = (TextView) hView.findViewById(R.id.nav_bar_header_user);
         ImageView icon = (ImageView) hView.findViewById(R.id.nav_bar_header_icon);
+        MenuItem favItem = menu.findItem(R.id.nav_fav);
 
+        if(mySPHelper.getFavMode()) favItem.setIcon(R.drawable.ic_white_full_star);
         background.setBackgroundResource(R.drawable.nav_background_campus_nord);
         name.setText("UPC - Telecom");
         if(user != null) userName.setText(user.getEmail());
@@ -166,16 +177,20 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_camera) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://atenea.upc.edu/moodle/login/index.php"));
             startActivity(browserIntent);
-        }else if(id==R.id.nav_fav) {
-            if(galleryFragment == null) {
-                Toast.makeText(this, "No subject selected.", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            galleryFragment.filterFavorites();
-            return true;
-        }
 
-        else if (id == R.id.nav_git_hub) {
+        }else if(id==R.id.nav_fav) {
+            if(galleryFragment != null && mySPHelper.getFavPhotos(mySPHelper.getCurrentSubject()) != null) {
+                boolean favMode = mySPHelper.getFavMode();
+                mySPHelper.setFavMode(!favMode);
+                if(!favMode) {
+                    item.setIcon(R.drawable.ic_white_full_star);
+                } else item.setIcon(R.drawable.ic_white_star);
+                galleryFragment.filterFavorites(!favMode);
+            }
+
+            return true;
+
+        } else if (id == R.id.nav_git_hub) {
 
             try {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/photoboard"));

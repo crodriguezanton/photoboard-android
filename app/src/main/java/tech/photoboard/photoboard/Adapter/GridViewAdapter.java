@@ -83,7 +83,7 @@ public class GridViewAdapter extends BaseAdapter {
         });
         //Establecemos la imagen de cada view de la gridview
         Picasso.with(context)
-                .load(ApiClient.URL + photoList.get(position).getPicture())
+                .load(/*ApiClient.URL +*/ photoList.get(position).getPicture())
                 //.skipMemoryCache()
                 //.noFade()
                 .into(img);

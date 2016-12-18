@@ -11,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -23,7 +24,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 
-import tech.photoboard.photoboard.API.ApiClient;
 import tech.photoboard.photoboard.Adapter.FullScreenImageAdapter;
 import tech.photoboard.photoboard.Classes.Photo;
 import tech.photoboard.photoboard.R;
@@ -50,7 +50,7 @@ public class ImageViewerActivity extends Activity {
     private int imgSelected;
     private ImageButton btnDownload;
     private ImageButton btnFavorite;
-    private String actualSubject;
+    private String currentSubject;
     private MySPHelper mySPHelper;
     private boolean actualPhotoFavorite;
 
@@ -64,6 +64,7 @@ public class ImageViewerActivity extends Activity {
         mySPHelper = new MySPHelper(this);
         //Recogemos informacion de la actividad desde donde se llama a esta:
         imgSelected = getIntent().getIntExtra("POSITION", 0);
+        currentSubject = mySPHelper.getCurrentSubject();
 
         //Cogemos la lista del Intent y la añadimos al adaptador.
         Gson gson = new Gson();
@@ -77,7 +78,7 @@ public class ImageViewerActivity extends Activity {
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                ArrayList<String> favPhotos = mySPHelper.getFavPhotos(mySPHelper.getCurrentSubject());
+                ArrayList<String> favPhotos = mySPHelper.getFavPhotos(currentSubject);
                 if(favPhotos!= null && favPhotos.contains(""+photoList.get(position).getId())) {
                     Log.i("FavList contains",""+photoList.get(position).getId());
                     actualPhotoFavorite = true;
@@ -110,7 +111,7 @@ public class ImageViewerActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Picasso.with(ImageViewerActivity.this)
-                        .load(ApiClient.URL + photoList.get(viewPager.getCurrentItem()).getPicture())
+                        .load(/*ApiClient.URL +*/ photoList.get(viewPager.getCurrentItem()).getPicture())
                         .skipMemoryCache()
                         .noFade()
                         .into(target);
@@ -122,8 +123,8 @@ public class ImageViewerActivity extends Activity {
             @Override
             public void onClick(View v) {
                 ArrayList<String> favPhotos = new ArrayList<String>();
-                if (mySPHelper.getFavPhotos(mySPHelper.getCurrentSubject())!=null) {
-                    favPhotos = mySPHelper.getFavPhotos(mySPHelper.getCurrentSubject());
+                if (mySPHelper.getFavPhotos(currentSubject)!=null) {
+                    favPhotos = mySPHelper.getFavPhotos(currentSubject);
                 }
                 if(!actualPhotoFavorite) {
                     actualPhotoFavorite = true;
@@ -158,7 +159,7 @@ public class ImageViewerActivity extends Activity {
                     File folder = new File(Environment.getExternalStoragePublicDirectory(
                             Environment.DIRECTORY_PICTURES), "Photoboard");
                     File subfolder = new File(Environment.getExternalStoragePublicDirectory(
-                            Environment.DIRECTORY_PICTURES)+"/Photoboard",mySPHelper.getCurrentSubject());
+                            Environment.DIRECTORY_PICTURES)+"/Photoboard",currentSubject);
                     folder.mkdirs();
                     subfolder.mkdirs();
                     String url =  photoList.get(viewPager.getCurrentItem()).getPicture();
@@ -184,6 +185,7 @@ public class ImageViewerActivity extends Activity {
                     //Añadimos la foto a la galeria del movil, sino hicieramos esto solo estaria
                     //en la carpeta de Photoboard
                     galleryAddPic(finalPath);
+                    Toast.makeText(ImageViewerActivity.this, "Added to " + currentSubject , Toast.LENGTH_SHORT).show();
                 }
             }).start();
         }

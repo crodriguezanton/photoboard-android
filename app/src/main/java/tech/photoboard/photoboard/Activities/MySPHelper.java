@@ -23,6 +23,7 @@ public class MySPHelper {
     private static final String SUBJECT_ID = "SUBJECT_ID";
     private static final String LOGGED_IN = "LOGGED_IN";
     private static final String USER = "USER";
+    private static final String FAV_MODE = "FAV_MODE";
 
     private Activity activity;
     private SharedPreferences sharedPreferences;
@@ -91,5 +92,12 @@ public class MySPHelper {
         editor.commit();
     }
 
+    public void setFavMode(boolean bool) {
+        editor.putBoolean(FAV_MODE, bool);
+        editor.commit();
+    }
+    public boolean getFavMode() {
+        return sharedPreferences.getBoolean(FAV_MODE, false);
+    }
 }
 
