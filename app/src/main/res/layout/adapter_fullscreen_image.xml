@@ -2,10 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:url="@+url/linear_prueba">
+    android:id="@+id/linear_prueba">
 
     <ImageView
-        android:url="@+url/iv_fullscreen_adapter"
+        android:id="@+id/iv_fullscreen_adapter"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />

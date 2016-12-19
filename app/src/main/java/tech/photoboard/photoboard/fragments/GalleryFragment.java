@@ -110,10 +110,10 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
         /*Update GridView*/
         getPhotosFromServer();
 /*
-        ArrayList<String> urls = new ArrayList( Arrays.asList(photos) );
+        ArrayList<String> ids = new ArrayList( Arrays.asList(photos) );
         ArrayList<Photo> newPhotos = new ArrayList<>();
         int iterator = 0;
-        for(String s: urls) {
+        for(String s: ids) {
             newPhotos.add(new Photo(s,iterator));
             iterator++;
         }
@@ -238,21 +238,21 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
     }
     class Worker implements Runnable {
 
-        String url;
+        String id;
         boolean die;
 
-        public Worker(String url) {
-            this.url = url;
+        public Worker(String id) {
+            this.id = id;
         }
 
         @Override
         public void run() {
-            RetrofitAPI retrofitAPIPool = ApiClient.getClientPool(url).create(RetrofitAPI.class);
+            RetrofitAPI retrofitAPIPool = ApiClient.getClientPool(id).create(RetrofitAPI.class);
             while (true) {
 
                 try {
                     //Cada 250ms preguntamos al servidor si tiene ya la foto
-                    die = getPhotoRequest(url, retrofitAPIPool);
+                    die = getPhotoRequest(id, retrofitAPIPool);
                     if (die) break;
                     wait(1000);
                 } catch (Exception e) {
@@ -281,12 +281,12 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
             }
         });
     }
-    public boolean getPhotoRequest(String url, RetrofitAPI retrofitAPIPool) {
+    public boolean getPhotoRequest(String id, RetrofitAPI retrofitAPIPool) {
 
         photoReceived = false;
 
         //Pedimos la foto
-        Call<PhotoPool> getPhotoResponse = retrofitAPIPool.getPhotoResquest(url);
+        Call<PhotoPool> getPhotoResponse = retrofitAPIPool.getPhotoResquest(id);
         getPhotoResponse.enqueue(new Callback<PhotoPool>() {
             @Override
             public void onResponse(Call<PhotoPool> call, Response<PhotoPool> response) {

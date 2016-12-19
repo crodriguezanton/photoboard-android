@@ -20,7 +20,7 @@ public class ApiClient {
         }
         return retrofit;
     }
-    public static Retrofit getClientPool(String url){
+    public static Retrofit getClientPool(String id){
         return new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
     }
 }

@@ -6,12 +6,12 @@
     android:background="@android:color/black">
 
     <android.support.v4.view.ViewPager
-        android:url="@+url/vp_image_pager"
+        android:id="@+id/vp_image_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <LinearLayout
-        android:url="@+url/ll_image_options"
+        android:id="@+id/ll_image_options"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -27,7 +27,7 @@
             android:layout_gravity="center"
             android:layout_marginRight="20dp">
             <ImageButton
-                android:url="@+url/btn_download_image"
+                android:id="@+id/btn_download_image"
                 android:background="@drawable/ic_white_download"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
@@ -45,7 +45,7 @@
             android:orientation="vertical"
             android:layout_gravity="center">
             <ImageButton
-                android:url="@+url/btn_add_favorite"
+                android:id="@+id/btn_add_favorite"
                 android:background="@drawable/ic_white_star"
                 android:layout_width="40dp"
                 android:layout_height="40dp"

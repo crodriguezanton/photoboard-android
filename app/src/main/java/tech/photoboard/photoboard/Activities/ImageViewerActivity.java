@@ -154,8 +154,8 @@ public class ImageViewerActivity extends Activity {
                 @Override
                 public void run() {
 
-                    String url =  photoList.get(viewPager.getCurrentItem()).getPicture();
-                    if(url == null) return;
+                    String id =  photoList.get(viewPager.getCurrentItem()).getPicture();
+                    if(id == null) return;
                     /* Creates a {Photoboard} folder and also a {Subject} folder inside.*/
 
                     File folder = new File(Environment.getExternalStoragePublicDirectory(
@@ -167,7 +167,7 @@ public class ImageViewerActivity extends Activity {
                     subfolder.mkdirs();
 
 
-                    String name = url.substring(url.lastIndexOf("/")+1) + "-" + currentSubject;
+                    String name = id.substring(id.lastIndexOf("/")+1) + "-" + currentSubject;
 
                     File file = new File(subfolder, name);
                     String finalPath = file.getAbsolutePath();

@@ -6,23 +6,23 @@ package tech.photoboard.photoboard.Classes;
 
 public class TakePhotoResponse extends Response {
 
-    String url;
+    String id;
 
-    public TakePhotoResponse(boolean success, int error_code, String error, String url) {
+    public TakePhotoResponse(boolean success, int error_code, String error, String id) {
         super(success, error_code, error);
-        this.url = url;
+        this.id = id;
     }
 
-    public TakePhotoResponse(boolean success, int error_code, String url) {
+    public TakePhotoResponse(boolean success, int error_code, String id) {
         super(success, error_code);
-        this.url = url;
+        this.id = id;
     }
 
     public String getUrl() {
-        return url;
+        return id;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setUrl(String id) {
+        this.id = id;
     }
 }
