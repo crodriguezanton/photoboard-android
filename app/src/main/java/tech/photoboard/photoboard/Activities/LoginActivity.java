@@ -46,7 +46,6 @@ public class LoginActivity extends Activity {
         setContentView(R.layout.activity_login);
 
         mySPHelper = new MySPHelper(this);
-        if(mySPHelper.getLoggedInState()) Log.i("????????????????","?????????????????????");
         if(mySPHelper.getLoggedInState()) {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
@@ -68,8 +67,8 @@ public class LoginActivity extends Activity {
 
                 if(!email.isEmpty() && !password.isEmpty()) {
                     user = new User(email,password);
-                    //logIn(user);
-                    newActivity();
+                    logIn(user);
+                    //newActivity();
                 } else {
                     Toast.makeText(getApplicationContext(), "Introduce all the empty fields", Toast.LENGTH_SHORT);
                 }

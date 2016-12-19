@@ -3,15 +3,15 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_fav"
+            android:url="@+url/nav_fav"
             android:icon="@drawable/ic_red_star"
             android:title="Favorites" />
         <item
-            android:id="@+id/nav_camera"
+            android:url="@+url/nav_camera"
             android:icon="@drawable/ic_webshield"
             android:title="Atenea" />
         <item
-            android:id="@+id/nav_git_hub"
+            android:url="@+url/nav_git_hub"
             android:icon="@drawable/ic_git_hub"
             android:title="Git Hub Repository" />
 
@@ -21,7 +21,7 @@
     <item android:title="Account">
         <menu>
             <item
-                android:id="@+id/nav_log_out"
+                android:url="@+url/nav_log_out"
                 android:icon="@drawable/ic_log_out"
                 android:title="Log Out" />
         </menu>

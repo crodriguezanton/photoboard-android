@@ -24,6 +24,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 
+import tech.photoboard.photoboard.API.ApiClient;
 import tech.photoboard.photoboard.Adapter.FullScreenImageAdapter;
 import tech.photoboard.photoboard.Classes.Photo;
 import tech.photoboard.photoboard.R;
@@ -111,7 +112,7 @@ public class ImageViewerActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Picasso.with(ImageViewerActivity.this)
-                        .load(/*ApiClient.URL +*/ photoList.get(viewPager.getCurrentItem()).getPicture())
+                        .load(ApiClient.URL + photoList.get(viewPager.getCurrentItem()).getPicture())
                         .skipMemoryCache()
                         .noFade()
                         .into(target);

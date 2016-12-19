@@ -96,12 +96,13 @@ public class MainActivity extends AppCompatActivity
     private void createSubjectListFragment() {
         subjects = new ArrayList<>();
         getSubjectsFromServer();
+        /*
         subjects.add(new Subject(0,"PSAVC", "AUDIO-VIDEO"));
         subjects.add(new Subject(0, "RP","PHYSICS"));
         subjects.add(new Subject(0,"PBE", "PROJECT"));
         subjects.add(new Subject(0, "TD", "PROGRAMMING"));
         subjects.add(new Subject(0, "DSBM","ELECTRONICS"));
-
+*/
 
         /*Saving subjects in sharedpreferences*/
         /*This is done in order to pass the subjects to the fragment*/

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="tech.photoboard.photoboard.Activities.MainPageActivity">
     <item
-        android:id="@+id/action_settings"
+        android:url="@+url/action_settings"
         android:orderInCategory="100"
         android:title="Refresh" />
 </menu>

@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <GridView
-            android:id="@+id/gv_subject_gallery"
+            android:url="@+url/gv_subject_gallery"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:stretchMode="columnWidth"
@@ -22,7 +22,7 @@
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_take_capture"
+        android:url="@+url/fab_take_capture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"

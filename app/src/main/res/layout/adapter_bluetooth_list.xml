@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/tv_bluetooth_devices_adapter"
+        android:url="@+url/tv_bluetooth_devices_adapter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/black"

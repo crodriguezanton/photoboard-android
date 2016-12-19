@@ -109,7 +109,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
 
         /*Update GridView*/
         getPhotosFromServer();
-
+/*
         ArrayList<String> urls = new ArrayList( Arrays.asList(photos) );
         ArrayList<Photo> newPhotos = new ArrayList<>();
         int iterator = 0;
@@ -119,7 +119,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
         }
         photoList = newPhotos;
         filterFavorites(mySPHelper.getFavMode());
-
+*/
 
 
         /*Setting the fab button*/
@@ -137,7 +137,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
                     //Dependiendo del modo:
                     case PHOTO_MODE:
                         btnTakePhoto.setEnabled(false);
-                        takePhotoRequest();
+                        if(bluetoothDevice != null) takePhotoRequest();
                         break;
 
                     case BLUETOOTH_MODE:
@@ -178,15 +178,14 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
         btnTakePhoto.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                //De momento, esto nos sirve para desconectarnos de la Edison en la que estemos
-                //Es decir, en modo foto, si mantenemos pulsado cambiamos a modo Bluetooth
+                /* Disconnects from Joule*/
                 if (currentMode == PHOTO_MODE) {
                     Toast.makeText(getActivity(), "Changed to Bluetooth Functionality", Toast.LENGTH_SHORT).show();
                     btnTakePhoto.setImageResource(R.drawable.ic_btn_bluetooth);
                     currentMode = BLUETOOTH_MODE;
                 }
 
-                return false;
+                return true;
             }
         });
         return view;
@@ -219,7 +218,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
 
     public void takePhotoRequest() {
         //Pedimos foto y esperamos respuesta
-        Call<TakePhotoResponse> takePhotoResponse = retrofitAPI.takePhotoRequest(subject.getId());
+        Call<TakePhotoResponse> takePhotoResponse = retrofitAPI.takePhotoRequest(subject.getId(), bluetoothDevice.getName());
         takePhotoResponse.enqueue(new Callback<TakePhotoResponse>() {
             @Override
             public void onResponse(Call<TakePhotoResponse> call, Response<TakePhotoResponse> response) {
@@ -227,7 +226,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
                 requestData = response.body();
                 if (requestData.isSuccess()) {
                     //Si es afirmativa, creamos un Thread que espere para recibir la foto
-                    new Thread(new Worker(requestData.getId())).start();
+                    new Thread(new Worker(requestData.getUrl())).start();
                 }
             }
 
@@ -239,21 +238,21 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
     }
     class Worker implements Runnable {
 
-        String id;
+        String url;
         boolean die;
 
-        public Worker(String id) {
-            this.id = id;
+        public Worker(String url) {
+            this.url = url;
         }
 
         @Override
         public void run() {
-
+            RetrofitAPI retrofitAPIPool = ApiClient.getClientPool(url).create(RetrofitAPI.class);
             while (true) {
 
                 try {
                     //Cada 250ms preguntamos al servidor si tiene ya la foto
-                    die = getPhotoRequest(id);
+                    die = getPhotoRequest(url, retrofitAPIPool);
                     if (die) break;
                     wait(1000);
                 } catch (Exception e) {
@@ -282,11 +281,12 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
             }
         });
     }
-    public boolean getPhotoRequest(String id) {
+    public boolean getPhotoRequest(String url, RetrofitAPI retrofitAPIPool) {
 
         photoReceived = false;
+
         //Pedimos la foto
-        Call<PhotoPool> getPhotoResponse = retrofitAPI.getPhotoResquest(id);
+        Call<PhotoPool> getPhotoResponse = retrofitAPIPool.getPhotoResquest(url);
         getPhotoResponse.enqueue(new Callback<PhotoPool>() {
             @Override
             public void onResponse(Call<PhotoPool> call, Response<PhotoPool> response) {
@@ -316,7 +316,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
     public void filterFavorites(boolean favMode) {
         if(favMode) {
             ArrayList<Photo> filteredPhotos = new ArrayList<>();
-            ArrayList<String> favPhotos = new ArrayList<>();
+            ArrayList<String> favPhotos;
             String actualSubject = mySPHelper.getCurrentSubject();
             favPhotos = mySPHelper.getFavPhotos(actualSubject);
             if(favPhotos == null) {

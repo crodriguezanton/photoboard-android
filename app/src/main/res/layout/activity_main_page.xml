@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+            android:url="@+url/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
@@ -25,7 +25,7 @@
                 android:layout_height="match_parent"
                 android:text="Photoboard"
                 android:gravity="center"
-                android:id="@+id/toolbar_title"
+                android:url="@+url/toolbar_title"
                 android:fontFamily="cursive"
                 android:textSize="30sp"
                 android:textColor="@color/white"
@@ -37,7 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <GridView
-            android:id="@+id/gv_main_page"
+            android:url="@+url/gv_main_page"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="?attr/actionBarSize"
@@ -53,7 +53,7 @@
 
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/btn_take_capture"
+        android:url="@+url/btn_take_capture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
