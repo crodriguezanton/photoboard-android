@@ -16,7 +16,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,23 +75,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-
-    @Override
-    public void openGallery(Subject subject) {
-
-        /*This will allow us to know at every moment in which subject are we*/
-        mySPHelper.setCurrentSubject(subject);
-
-        /*Process to change the fragment*/
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        galleryFragment = GalleryFragment.newInstance(subject);
-        transaction.replace(R.id.fragment_container, galleryFragment, "HELLO");
-        transaction.addToBackStack("HELLO");
-        transaction.commit();
-
-    }
-
     private void createSubjectListFragment() {
         subjects = new ArrayList<>();
         getSubjectsFromServer();
@@ -140,10 +122,27 @@ public class MainActivity extends AppCompatActivity
         setNavigationHeaderStyle(navigationView);
 
     }
+    @Override
+    public void openGallery(Subject subject) {
+
+        /*This will allow us to know at every moment in which subject are we*/
+        mySPHelper.setCurrentSubject(subject);
+
+        /*Process to change the fragment*/
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        galleryFragment = GalleryFragment.newInstance(subject);
+        transaction.replace(R.id.fragment_container, galleryFragment, "HELLO");
+        transaction.addToBackStack("HELLO");
+        transaction.commit();
+
+    }
 
     public void setNavigationHeaderStyle( NavigationView navigationView) {
+
         View hView =  navigationView.getHeaderView(0);
         Menu menu = navigationView.getMenu();
+
         LinearLayout background = (LinearLayout) hView.findViewById(R.id.nav_bar_header_background);
         TextView name = (TextView) hView.findViewById(R.id.nav_bar_header_name);
         TextView userName = (TextView) hView.findViewById(R.id.nav_bar_header_user);
@@ -170,16 +169,18 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
+        /* Handle navigation view item clicks here.*/
+
         int id = item.getItemId();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_atenea) {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://atenea.upc.edu/moodle/login/index.php"));
             startActivity(browserIntent);
 
         }else if(id==R.id.nav_fav) {
+
             if(galleryFragment != null && mySPHelper.getFavPhotos(mySPHelper.getCurrentSubject()) != null) {
                 boolean favMode = mySPHelper.getFavMode();
                 mySPHelper.setFavMode(!favMode);
@@ -188,7 +189,6 @@ public class MainActivity extends AppCompatActivity
                 } else item.setIcon(R.drawable.ic_white_star);
                 galleryFragment.filterFavorites(!favMode);
             }
-
             return true;
 
         } else if (id == R.id.nav_git_hub) {

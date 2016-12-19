@@ -42,7 +42,6 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         /*Checking if we are already logged in*/
-
         setContentView(R.layout.activity_login);
 
         mySPHelper = new MySPHelper(this);
@@ -50,7 +49,7 @@ public class LoginActivity extends Activity {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
             finish();
-        };
+        }
 
         emailEditText = (EditText) findViewById(R.id.et_username_login);
         passwordEditText = (EditText) findViewById(R.id.et_password_login);
@@ -66,12 +65,16 @@ public class LoginActivity extends Activity {
                 String password = passwordEditText.getText().toString();
 
                 if(!email.isEmpty() && !password.isEmpty()) {
+
                     user = new User(email,password);
                     logIn(user);
-                    //newActivity();
+
                 } else {
+
                     Toast.makeText(getApplicationContext(), "Introduce all the empty fields", Toast.LENGTH_SHORT);
+
                 }
+                loginButton.setEnabled(true);
             }
         });
 
@@ -86,14 +89,12 @@ public class LoginActivity extends Activity {
             public void onResponse(Call<tech.photoboard.photoboard.Classes.Response> call,
                                    Response<tech.photoboard.photoboard.Classes.Response> response) {
                 Boolean success = response.body().isSuccess();
-                loginButton.setEnabled(true);
                 if(success) newActivity();
                 else Toast.makeText(getApplicationContext(), "Incorrect username or password", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(Call<tech.photoboard.photoboard.Classes.Response> call, Throwable t) {
-                loginButton.setEnabled(true);
                 Toast.makeText(LoginActivity.this,"Unreachable Server",Toast.LENGTH_SHORT).show();
             }
 
@@ -102,11 +103,13 @@ public class LoginActivity extends Activity {
     }
 
     public void newActivity() {
+
         mySPHelper.setLoggedIn(true);
         mySPHelper.setUser(user);
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
         finish();
+
     }
 
 }

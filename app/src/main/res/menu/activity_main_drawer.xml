@@ -7,7 +7,7 @@
             android:icon="@drawable/ic_red_star"
             android:title="Favorites" />
         <item
-            android:url="@+url/nav_camera"
+            android:url="@+url/nav_atenea"
             android:icon="@drawable/ic_webshield"
             android:title="Atenea" />
         <item

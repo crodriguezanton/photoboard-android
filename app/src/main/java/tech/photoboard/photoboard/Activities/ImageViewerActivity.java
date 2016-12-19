@@ -33,16 +33,13 @@ import tech.photoboard.photoboard.R;
  * Created by pc1 on 23/10/2016.
  */
 
-/*Esta Actividad es la que se abre cuando pulsamos una foto,
- *basicamente es el visor de fotos.
- */
+/* Photo Viewer:
+*   - Zoom capability
+*   - Download images to {SUBJECT} folder, in pictures
+*   - Add photos to favorites
+*/
 public class ImageViewerActivity extends Activity {
 
-    //Declaracion de variables a usar:
-    /*La lista de las fotos, el adaptador de la foto,
-     * el viewPager (el contenedor que desliza las fotos hacia los lados)
-     * la posicion de la foto seleccionada y el boton de descarga
-     */
 
 
     private ArrayList<Photo> photoList;
@@ -53,7 +50,7 @@ public class ImageViewerActivity extends Activity {
     private ImageButton btnFavorite;
     private String currentSubject;
     private MySPHelper mySPHelper;
-    private boolean actualPhotoFavorite;
+    private boolean currentPhotoIsFav;
 
 
 
@@ -63,30 +60,33 @@ public class ImageViewerActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_viewer);
         mySPHelper = new MySPHelper(this);
-        //Recogemos informacion de la actividad desde donde se llama a esta:
-        imgSelected = getIntent().getIntExtra("POSITION", 0);
         currentSubject = mySPHelper.getCurrentSubject();
 
-        //Cogemos la lista del Intent y la añadimos al adaptador.
+        /* Retrieving Photos from Intent and give them to the Viewer adapter*/
         Gson gson = new Gson();
-        Type type = new TypeToken<ArrayList<Photo>>() {
-        }.getType();
+        Type type = new TypeToken<ArrayList<Photo>>() {}.getType();
         photoList = gson.fromJson(getIntent().getStringExtra("FULLSCREEN_IMAGES"), type);
-        adapter = new FullScreenImageAdapter(ImageViewerActivity.this, photoList);
 
-        //Creamos el viewPager con el adaptador de antes.
         viewPager = (ViewPager) findViewById(R.id.vp_image_pager);
+        adapter = new FullScreenImageAdapter(ImageViewerActivity.this, photoList);
+        viewPager.setAdapter(adapter);
+
+        imgSelected = getIntent().getIntExtra("POSITION", 0);
+        viewPager.setCurrentItem(imgSelected);
+
+        /* Giving functionality to the OnPageChangeListener:
+         *   - Modify favorite button if photo has been added to favorites.
+         */
+
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 ArrayList<String> favPhotos = mySPHelper.getFavPhotos(currentSubject);
                 if(favPhotos!= null && favPhotos.contains(""+photoList.get(position).getId())) {
-                    Log.i("FavList contains",""+photoList.get(position).getId());
-                    actualPhotoFavorite = true;
+                    currentPhotoIsFav = true;
                     btnFavorite.setBackgroundResource(R.drawable.ic_red_star);
                 } else  {
-                    Log.i("FavList NOT contains",""+position);
-                    actualPhotoFavorite = false;
+                    currentPhotoIsFav = false;
                     btnFavorite.setBackgroundResource(R.drawable.ic_white_star);
                 }
             }
@@ -101,13 +101,14 @@ public class ImageViewerActivity extends Activity {
 
             }
         });
-        viewPager.setAdapter(adapter);
 
-        //Seleccionamos la posicion deseada.
-        viewPager.setCurrentItem(imgSelected);
-
-        //Declaramos el boton de descarga y su funcionalidad
+        /* Adding functionality to download button and favorite button
+         * #btnDownload will download image to object target
+         * #btnFavorite will add photo to favorite list in SharedPreferences
+         * */
         btnDownload = (ImageButton) findViewById(R.id.btn_download_image);
+        btnFavorite = (ImageButton) findViewById(R.id.btn_add_favorite);
+
         btnDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -118,37 +119,34 @@ public class ImageViewerActivity extends Activity {
                         .into(target);
             }
         });
-        /*Adding photo to favorites*/
-        btnFavorite = (ImageButton) findViewById(R.id.btn_add_favorite);
+
         btnFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<String> favPhotos = new ArrayList<String>();
-                if (mySPHelper.getFavPhotos(currentSubject)!=null) {
-                    favPhotos = mySPHelper.getFavPhotos(currentSubject);
+                ArrayList<String> favPhotos = mySPHelper.getFavPhotos(currentSubject);
+
+                if (favPhotos==null) {
+                    favPhotos = new ArrayList<String>();
                 }
-                if(!actualPhotoFavorite) {
-                    actualPhotoFavorite = true;
+
+                if(!currentPhotoIsFav) {
+
+                    currentPhotoIsFav = true;
                     btnFavorite.setBackgroundResource(R.drawable.ic_red_star);
                     favPhotos.add(""+photoList.get(viewPager.getCurrentItem()).getId());
 
-                    for(String s: favPhotos) {
-                        Log.i("Message", s);
-                    }
-                    mySPHelper.setFavPhotos(favPhotos);
                 } else {
-                    /*Eliminar de favorito*/
-                    actualPhotoFavorite = false;
+                    currentPhotoIsFav = false;
                     btnFavorite.setBackgroundResource(R.drawable.ic_white_star);
                     favPhotos.remove(""+photoList.get(viewPager.getCurrentItem()).getId());
-                    mySPHelper.setFavPhotos(favPhotos);
                 }
+                mySPHelper.setFavPhotos(favPhotos);
 
 
             }
         });
     }
-    //Target nos sirve para guardar la foto en la SD
+
     private Target target = new Target() {
         @Override
         public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
@@ -156,42 +154,46 @@ public class ImageViewerActivity extends Activity {
                 @Override
                 public void run() {
 
-                    //Se crea una carpeta en el movil en caso de que no existiera.
-                    File folder = new File(Environment.getExternalStoragePublicDirectory(
-                            Environment.DIRECTORY_PICTURES), "Photoboard");
-                    File subfolder = new File(Environment.getExternalStoragePublicDirectory(
-                            Environment.DIRECTORY_PICTURES)+"/Photoboard",currentSubject);
-                    folder.mkdirs();
-                    subfolder.mkdirs();
                     String url =  photoList.get(viewPager.getCurrentItem()).getPicture();
                     if(url == null) return;
-                    String name = url.substring(url.lastIndexOf("/")+1);
-                    //declaramos un archivo con el nombre de la foto y la direccion.
+                    /* Creates a {Photoboard} folder and also a {Subject} folder inside.*/
+
+                    File folder = new File(Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_PICTURES), "Photoboard");
+                    folder.mkdirs();
+
+                    File subfolder = new File(Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_PICTURES)+"/Photoboard",currentSubject);
+                    subfolder.mkdirs();
+
+
+                    String name = url.substring(url.lastIndexOf("/")+1) + "-" + currentSubject;
+
                     File file = new File(subfolder, name);
                     String finalPath = file.getAbsolutePath();
+
                     try
                     {
-                        //Se crea el archivo a traves del bitmap recivido por Picasso
+                        /* Trying to save picture to sd-card*/
+
                         file.createNewFile();
                         FileOutputStream ostream = new FileOutputStream(file);
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 75, ostream);
                         ostream.close();
-
 
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
                     }
-                    //Añadimos la foto a la galeria del movil, sino hicieramos esto solo estaria
-                    //en la carpeta de Photoboard
+                    /* Finally we add the picture to the gallery.*/
                     galleryAddPic(finalPath);
                     Toast.makeText(ImageViewerActivity.this, "Added to " + currentSubject , Toast.LENGTH_SHORT).show();
                 }
             }).start();
         }
         private void galleryAddPic(String mCurrentPhotoPath) {
-            //Añade la foto a la galeria.
+
             Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
             File f = new File(mCurrentPhotoPath);
             Uri contentUri = Uri.fromFile(f);
