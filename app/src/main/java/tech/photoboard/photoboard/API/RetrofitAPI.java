@@ -31,8 +31,8 @@ public interface RetrofitAPI {
     @POST("picture-request/")
     Call<TakePhotoResponse> takePhotoRequest(@Field("subject") int id);
 
-    @GET
-    Call<PhotoPool> getPhotoResquest(@Url String url);
+    @GET("pool-request/{id}")
+    Call<PhotoPool> getPhotoResquest(@Path String id);
 
     @POST("subjects")
     Call<ArrayList<Subject>> getSubjectsList(@Body User user);
