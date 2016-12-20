@@ -13,4 +13,9 @@
     <color name="colorProject">#FFFFFF</color>
     <color name="colorProgramming">#FFFFFF</color>
     <color name="colorAudioVideo">#FFFFFF</color>
+
+    <color name="refresh_1">#01579b</color>
+    <color name="refresh_2">#0288d1</color>
+    <color name="refresh_3">#03a9f4</color>
+    <color name="refresh_4">#4fc3f7</color>
 </resources>

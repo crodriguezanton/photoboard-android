@@ -42,7 +42,7 @@ public class MySPHelper {
     }
     public void setCurrentSubject (Subject subject) {
         if (subject != null) {
-            editor.putString(SUBJECT_ID, subject.getName());
+            editor.putString(SUBJECT_ID, subject.getShort_name());
             editor.commit();
         } else if (getCurrentSubject() != null) {
             editor.remove(SUBJECT_ID);

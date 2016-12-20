@@ -59,9 +59,9 @@ public class SubjectsListAdapter extends BaseAdapter {
 
         background.setBackgroundResource(R.color.colorProgramming);
 
-        String subjectName = subjects.get(position).getName();
+        String subjectName = subjects.get(position).getShort_name();
         if( subjectName!= null) {
-            subjectTextView.setText(subjects.get(position).getName());
+            subjectTextView.setText(subjects.get(position).getShort_name());
         } else subjectTextView.setText("Null");
 
         background.setOnClickListener(new View.OnClickListener() {

@@ -6,15 +6,27 @@ package tech.photoboard.photoboard.Classes;
 
 public class PhotoPool extends Response {
 
-    String id;
+    boolean ready;
     Photo picture;
 
-    public String getId() {
-        return id;
+    public PhotoPool(boolean success, int error_code, String error, boolean ready, Photo picture) {
+        super(success, error_code, error);
+        this.ready = ready;
+        this.picture = picture;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public PhotoPool(boolean success, int error_code, boolean ready, Photo picture) {
+        super(success, error_code);
+        this.ready = ready;
+        this.picture = picture;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
     }
 
     public Photo getPicture() {
@@ -23,19 +35,5 @@ public class PhotoPool extends Response {
 
     public void setPicture(Photo picture) {
         this.picture = picture;
-    }
-
-    public PhotoPool(boolean success, int error_code, String error, String id, Photo picture) {
-        super(success, error_code, error);
-        this.id = id;
-        this.picture = picture;
-    }
-
-    public PhotoPool(boolean success, int error_code, String error) {
-        super(success, error_code, error);
-    }
-
-    public PhotoPool(boolean success, int error_code) {
-        super(success, error_code);
     }
 }

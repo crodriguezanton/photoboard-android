@@ -112,11 +112,12 @@ public class ImageViewerActivity extends Activity {
         btnDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                btnDownload.setEnabled(false);
                 Picasso.with(ImageViewerActivity.this)
                         .load(ApiClient.URL + photoList.get(viewPager.getCurrentItem()).getPicture())
-                        .skipMemoryCache()
-                        .noFade()
                         .into(target);
+                Toast.makeText(getApplicationContext(), "Added to " + currentSubject , Toast.LENGTH_SHORT).show();
+                btnDownload.setEnabled(true);
             }
         });
 
@@ -167,7 +168,7 @@ public class ImageViewerActivity extends Activity {
                     subfolder.mkdirs();
 
 
-                    String name = id.substring(id.lastIndexOf("/")+1) + "-" + currentSubject;
+                    String name = id.substring(id.lastIndexOf("/")+1);
 
                     File file = new File(subfolder, name);
                     String finalPath = file.getAbsolutePath();
@@ -188,7 +189,6 @@ public class ImageViewerActivity extends Activity {
                     }
                     /* Finally we add the picture to the gallery.*/
                     galleryAddPic(finalPath);
-                    Toast.makeText(ImageViewerActivity.this, "Added to " + currentSubject , Toast.LENGTH_SHORT).show();
                 }
             }).start();
         }
@@ -199,7 +199,6 @@ public class ImageViewerActivity extends Activity {
             Uri contentUri = Uri.fromFile(f);
             mediaScanIntent.setData(contentUri);
             sendBroadcast(mediaScanIntent);
-
         }
         @Override
         public void onBitmapFailed(Drawable errorDrawable) {

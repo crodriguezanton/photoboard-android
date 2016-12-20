@@ -46,11 +46,7 @@ public class MainActivity extends AppCompatActivity
 
 {
 
-    public static final String SUBJECTS_LIST = "SUBJECT_LIST";
-    private SubjectFragment subjectFragment;
     private GalleryFragment galleryFragment;
-    final RetrofitAPI retrofitAPI = ApiClient.getClient().create(RetrofitAPI.class);
-    private ArrayList<Subject> subjects;
     private User user;
     private MySPHelper mySPHelper;
 
@@ -61,7 +57,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         mySPHelper = new MySPHelper(this);
         user = mySPHelper.getUser();
-        createSubjectListFragment();
+        createSubjectFragment();
         setAppBarContent();
 
     }
@@ -75,24 +71,12 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void createSubjectListFragment() {
-        subjects = new ArrayList<>();
-        getSubjectsFromServer();
-        /*
-        subjects.add(new Subject(0,"PSAVC", "AUDIO-VIDEO"));
-        subjects.add(new Subject(0, "RP","PHYSICS"));
-        subjects.add(new Subject(0,"PBE", "PROJECT"));
-        subjects.add(new Subject(0, "TD", "PROGRAMMING"));
-        subjects.add(new Subject(0, "DSBM","ELECTRONICS"));
-*/
-
-        /*Saving subjects in sharedpreferences*/
+    private void createSubjectFragment() {
         /*This is done in order to pass the subjects to the fragment*/
         /*Setting the subjects container fragment*/
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
-        subjectFragment = SubjectFragment.newInstance(subjects);
-        transaction.replace(R.id.fragment_container, subjectFragment);
+        transaction.replace(R.id.fragment_container, new SubjectFragment());
         transaction.commit();
     }
 
@@ -223,23 +207,6 @@ public class MainActivity extends AppCompatActivity
         galleryFragment.onItemSelected(bd);
     }
 
-    public void getSubjectsFromServer () {
-        Call<ArrayList<Subject>> getSubjects = retrofitAPI.getSubjectsList();
-        getSubjects.enqueue(new Callback<ArrayList<Subject>>() {
-            @Override
-            public void onResponse(Call<ArrayList<Subject>> call, Response<ArrayList<Subject>> response) {
-                subjects = response.body();
-                for (int i = 0; i < subjects.size() && subjects!=null; i++) {
-                    Log.e("Message", subjects.get(i).getName() + " has been added.");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ArrayList<Subject>> call, Throwable t) {
-                Log.e("Message", "Could not retrieve subjects.");
-            }
-        });
-    }
 }
 
 

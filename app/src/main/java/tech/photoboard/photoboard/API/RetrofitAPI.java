@@ -4,9 +4,12 @@ import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Url;
 import tech.photoboard.photoboard.Classes.Photo;
 import tech.photoboard.photoboard.Classes.PhotoPool;
 import tech.photoboard.photoboard.Classes.PictureGallery;
@@ -21,23 +24,20 @@ import tech.photoboard.photoboard.Classes.User;
 
 public interface RetrofitAPI {
 
-    @POST("/login")
+    @POST("login")
     Call<Response> login(@Body User user) ;
 
-    @GET("/pictures")
-    Call<ArrayList<Photo>> getPicturesList();
+    @FormUrlEncoded
+    @POST("picture-request/")
+    Call<TakePhotoResponse> takePhotoRequest(@Field("subject") int id);
 
-    @POST("/takephoto")
-    Call<TakePhotoResponse> takePhotoRequest(@Body int id, @Body String joule);
+    @GET
+    Call<PhotoPool> getPhotoResquest(@Url String url);
 
-    @GET("/poolphoto/{id}")
-    Call<PhotoPool> getPhotoResquest(@Path("id") String id);
+    @POST("subjects")
+    Call<ArrayList<Subject>> getSubjectsList(@Body User user);
 
-    @GET("/subjects")
-    Call<ArrayList<Subject>> getSubjectsList();
-
-    @GET("/subjectgallery/{id}")
-    Call<PictureGallery> getSubjectPhotos(@Path("id") int id);
-
+    @GET
+    Call<PictureGallery> getSubjectPhotos(@Url String url);
 
 }

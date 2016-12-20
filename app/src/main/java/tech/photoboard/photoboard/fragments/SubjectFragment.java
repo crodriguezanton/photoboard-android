@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +23,11 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import tech.photoboard.photoboard.API.ApiClient;
+import tech.photoboard.photoboard.API.RetrofitAPI;
 import tech.photoboard.photoboard.Activities.ImageViewerActivity;
 import tech.photoboard.photoboard.Activities.LoginActivity;
 import tech.photoboard.photoboard.Activities.MainActivity;
@@ -41,17 +48,9 @@ public class SubjectFragment extends Fragment {
     public ArrayList<Subject> subjects;
     private SubjectsListAdapter subjectsListAdapter;
     private MySPHelper mySPHelper;
+    final RetrofitAPI retrofitAPI = ApiClient.getClient().create(RetrofitAPI.class);
+    private SwipeRefreshLayout swipeRefreshLayout;
 
-    /*"Constructor"*/
-    public static SubjectFragment newInstance(ArrayList<Subject> subjects) {
-        SubjectFragment fragment = new SubjectFragment();
-        Bundle bundle = new Bundle();
-        Gson gson = new Gson();
-        bundle.putSerializable(MainActivity.SUBJECTS_LIST, gson.toJson(subjects));
-        fragment.setArguments(bundle);
-
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,6 +58,39 @@ public class SubjectFragment extends Fragment {
         mySPHelper = new MySPHelper(getActivity());
         mySPHelper.setCurrentSubject(null);
         subjects = new ArrayList<>();
+
+    }
+
+
+    public void getSubjectsFromServer () {
+
+        swipeRefreshLayout.setEnabled(true);
+        swipeRefreshLayout.setRefreshing(true);
+
+        Call<ArrayList<Subject>> getSubjects = retrofitAPI.getSubjectsList(mySPHelper.getUser());
+        getSubjects.enqueue(new Callback<ArrayList<Subject>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Subject>> call, Response<ArrayList<Subject>> response) {
+                subjects = response.body();
+                if(subjects != null) {
+                    for (int i = 0; i < subjects.size() && subjects != null; i++) {
+                        Log.e("Message", subjects.get(i).getShort_name() + " has been added.");
+                    }
+                }
+
+                subjectsListAdapter.subjects = subjects;
+                subjectsListAdapter.notifyDataSetChanged();
+                swipeRefreshLayout.setRefreshing(false);
+                swipeRefreshLayout.setEnabled(false);
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Subject>> call, Throwable t) {
+                Log.e("Message", "Could not retrieve subjects.");
+                swipeRefreshLayout.setRefreshing(false);
+                swipeRefreshLayout.setEnabled(false);
+            }
+        });
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,14 +99,18 @@ public class SubjectFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_list_view, container, false);
 
         /*Extracting subjects from SharedPreferences*/
-        Gson gson = new Gson();
-        Type type = new TypeToken<ArrayList<Subject>>() {}.getType();
-        subjects = gson.fromJson((String) getArguments().getSerializable(MainActivity.SUBJECTS_LIST), type);
+
 
         /*Setting the adapter*/
         subjectsList = (ListView) view.findViewById(R.id.lv_fragment);
         subjectsListAdapter = new SubjectsListAdapter(getActivity(), subjects);
         subjectsList.setAdapter(subjectsListAdapter);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout_subject);
+        swipeRefreshLayout.setColorSchemeResources(R.color.refresh_1, R.color.refresh_2, R.color.refresh_3, R.color.refresh_4);
+        swipeRefreshLayout.setEnabled(false);
+
+        getSubjectsFromServer();
 
         /*Setting the navigation header*/
         setNavigationDrawerStyle();

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +13,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+
+import java.io.Console;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,6 +35,7 @@ public class LoginActivity extends Activity {
     private EditText emailEditText;
     private EditText passwordEditText;
     private Button loginButton;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private User user = new User();
     private MySPHelper mySPHelper;
@@ -43,6 +47,10 @@ public class LoginActivity extends Activity {
 
         /*Checking if we are already logged in*/
         setContentView(R.layout.activity_login);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout_login);
+        swipeRefreshLayout.setColorSchemeResources(R.color.refresh_1, R.color.refresh_2, R.color.refresh_3, R.color.refresh_4);
+        swipeRefreshLayout.setEnabled(false);
 
         mySPHelper = new MySPHelper(this);
         if(mySPHelper.getLoggedInState()) {
@@ -58,6 +66,8 @@ public class LoginActivity extends Activity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                swipeRefreshLayout.setEnabled(true);
+                swipeRefreshLayout.setRefreshing(true);
 
                 loginButton.setEnabled(false);
 
@@ -71,16 +81,20 @@ public class LoginActivity extends Activity {
 
                 } else {
 
+                    loginButton.setEnabled(true);
                     Toast.makeText(getApplicationContext(), "Introduce all the empty fields", Toast.LENGTH_SHORT);
 
                 }
-                loginButton.setEnabled(true);
+
             }
         });
 
     }
 
+
     public void logIn(User user){
+
+        swipeRefreshLayout.setRefreshing(true);
 
         Call<tech.photoboard.photoboard.Classes.Response> logResponse = retrofitAPI.login(user);
         logResponse.enqueue(new Callback<tech.photoboard.photoboard.Classes.Response>() {
@@ -88,7 +102,11 @@ public class LoginActivity extends Activity {
             @Override
             public void onResponse(Call<tech.photoboard.photoboard.Classes.Response> call,
                                    Response<tech.photoboard.photoboard.Classes.Response> response) {
+                Log.e("Response",response.raw().toString());
                 Boolean success = response.body().isSuccess();
+                swipeRefreshLayout.setEnabled(false);
+                loginButton.setEnabled(true);
+                swipeRefreshLayout.setRefreshing(false);
                 if(success) newActivity();
                 else Toast.makeText(getApplicationContext(), "Incorrect username or password", Toast.LENGTH_SHORT).show();
             }
@@ -96,6 +114,9 @@ public class LoginActivity extends Activity {
             @Override
             public void onFailure(Call<tech.photoboard.photoboard.Classes.Response> call, Throwable t) {
                 Toast.makeText(LoginActivity.this,"Unreachable Server",Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
+                swipeRefreshLayout.setEnabled(false);
+                loginButton.setEnabled(true);
             }
 
         });

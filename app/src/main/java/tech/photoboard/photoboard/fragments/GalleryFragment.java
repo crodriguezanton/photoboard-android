@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,6 +64,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
 
     BluetoothAdapter bluetoothAdapter;
     BluetoothDevice bluetoothDevice;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     boolean photoReceived;
     private MySPHelper mySPHelper;
@@ -100,6 +103,15 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
         subject = gson.fromJson((String) getArguments().getSerializable(SUBJECT_KEY) ,type);
         setSubjectStyle();
 
+        /*Swipe Refresh Layout*/
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout_gallery);
+        swipeRefreshLayout.setColorSchemeResources(R.color.refresh_1, R.color.refresh_2, R.color.refresh_3, R.color.refresh_4);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getPhotosFromServer();
+            }
+        });
 
         /*Setting the gallery*/
         photoList = new ArrayList<>();
@@ -217,12 +229,16 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
     }
 
     public void takePhotoRequest() {
+
+        swipeRefreshLayout.setRefreshing(true);
+
         //Pedimos foto y esperamos respuesta
-        Call<TakePhotoResponse> takePhotoResponse = retrofitAPI.takePhotoRequest(subject.getId(), bluetoothDevice.getName());
+        Call<TakePhotoResponse> takePhotoResponse = retrofitAPI.takePhotoRequest(subject.getId());
         takePhotoResponse.enqueue(new Callback<TakePhotoResponse>() {
             @Override
             public void onResponse(Call<TakePhotoResponse> call, Response<TakePhotoResponse> response) {
                 btnTakePhoto.setEnabled(true);
+                Log.e("Raw", response.message()+response.raw().toString());
                 requestData = response.body();
                 if (requestData.isSuccess()) {
                     //Si es afirmativa, creamos un Thread que espere para recibir la foto
@@ -247,12 +263,12 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
 
         @Override
         public void run() {
-            RetrofitAPI retrofitAPIPool = ApiClient.getClientPool(id).create(RetrofitAPI.class);
+
             while (true) {
 
                 try {
                     //Cada 250ms preguntamos al servidor si tiene ya la foto
-                    die = getPhotoRequest(id, retrofitAPIPool);
+                    die = getPhotoRequest(id);
                     if (die) break;
                     wait(1000);
                 } catch (Exception e) {
@@ -263,38 +279,39 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
         }
     }
     public void getPhotosFromServer() {
-        Call<PictureGallery> getPhotos = retrofitAPI.getSubjectPhotos(subject.getId());
+
+        Call<PictureGallery> getPhotos = retrofitAPI.getSubjectPhotos(subject.getUrl());
         getPhotos.enqueue(new Callback<PictureGallery>() {
             @Override
             public void onResponse(Call<PictureGallery> call, Response<PictureGallery> response) {
                 PictureGallery photoGallery = response.body();
                 photoList = photoGallery.getPictures();
-                for (int i = 0; i < photoList.size(); i++) {
-                    Log.e("Message", String.valueOf(photoList.get(i).getId()) + " " + photoList.get(i).getPicture());
-                }
                 gridViewAdapter.updateList(photoList);
+                swipeRefreshLayout.setRefreshing(false);
             }
 
             @Override
             public void onFailure(Call<PictureGallery> call, Throwable t) {
-
+             swipeRefreshLayout.setRefreshing(false);
             }
         });
     }
-    public boolean getPhotoRequest(String id, RetrofitAPI retrofitAPIPool) {
+
+    public boolean getPhotoRequest(String id) {
 
         photoReceived = false;
 
         //Pedimos la foto
-        Call<PhotoPool> getPhotoResponse = retrofitAPIPool.getPhotoResquest(id);
+        Call<PhotoPool> getPhotoResponse = retrofitAPI.getPhotoResquest(id);
         getPhotoResponse.enqueue(new Callback<PhotoPool>() {
             @Override
             public void onResponse(Call<PhotoPool> call, Response<PhotoPool> response) {
                 PhotoPool photo = response.body();
                 //Si nos la envia, la añadimos a la lista.
-                if (photo.getPicture() != null) {
+                if (photo.isReady()) {
                     photoReceived = true;
-                    gridViewAdapter.addPhotoToList(photo.getPicture());
+                    if(photo.getPicture() != null) gridViewAdapter.addPhotoToList(photo.getPicture());
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
 
@@ -310,7 +327,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
         NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
         View hView =  navigationView.getHeaderView(0);
         TextView name = (TextView) hView.findViewById(R.id.nav_bar_header_name);
-        name.setText(subject.getName());
+        name.setText(subject.getShort_name());
 
     }
     public void filterFavorites(boolean favMode) {
