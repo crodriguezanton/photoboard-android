@@ -297,7 +297,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
         });
     }
 
-    public boolean getPhotoRequest(String id) {
+    public void getPhotoRequest(String id) {
 
         photoReceived = false;
 
@@ -316,6 +316,8 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
                     photoReceived = true;
                     if(photo.getPicture() != null) gridViewAdapter.addPhotoToList(photo.getPicture());
                     swipeRefreshLayout.setRefreshing(false);
+                } else {
+                    getPhotoRequest(photo.getUrl());
                 }
             }
 
@@ -324,7 +326,6 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
                 Log.e("failure","failure");
             }
         });
-        return photoReceived;
     }
 
     private void setSubjectStyle() {
