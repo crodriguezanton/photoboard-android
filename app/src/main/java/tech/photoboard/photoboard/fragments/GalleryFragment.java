@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
@@ -242,7 +243,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
                 requestData = response.body();
 
                 //Si es afirmativa, creamos un Thread que espere para recibir la foto
-                getPhotoResponse(requestData.getUrl());
+                getPhotoRequest(requestData.getUuid());
 
             }
 
@@ -252,7 +253,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
             }
         });
     }
-    }
+
     public void getPhotosFromServer() {
 
         Call<PictureGallery> getPhotos = retrofitAPI.getSubjectPhotos(subject.getUrl());
@@ -276,14 +277,13 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
 
         photoReceived = false;
 
-        Log.e("asd","asd");
-
         //Pedimos la foto
         Call<PhotoPool> getPhotoResponse = retrofitAPI.getPhotoResquest(id);
+        Log.e("Url", id);
         getPhotoResponse.enqueue(new Callback<PhotoPool>() {
             @Override
             public void onResponse(Call<PhotoPool> call, Response<PhotoPool> response) {
-                PhotoPool photo = response.body();
+                final PhotoPool photo = response.body();
                 //Si nos la envia, la añadimos a la lista.
                 Log.e("Raw", response.message()+response.raw().toString());
 
@@ -292,8 +292,15 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
                     if(photo.getPicture() != null) gridViewAdapter.addPhotoToList(photo.getPicture());
                     swipeRefreshLayout.setRefreshing(false);
                 } else {
-                    Thread.sleep(1000);
-                    getPhotoRequest(photo.getUrl());
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            //Do something after 100ms
+                            getPhotoRequest(photo.getUuid());
+                        }
+                    }, 1000);
+
                 }
             }
 
