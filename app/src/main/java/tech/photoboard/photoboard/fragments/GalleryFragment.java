@@ -242,7 +242,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
                 requestData = response.body();
 
                 //Si es afirmativa, creamos un Thread que espere para recibir la foto
-                new Thread(new Worker(requestData.getUrl())).start();
+                getPhotoResponse(requestData.getUrl());
 
             }
 
@@ -252,31 +252,6 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
             }
         });
     }
-    class Worker implements Runnable {
-
-        String id;
-        boolean die;
-
-        public Worker(String id) {
-            this.id = id;
-        }
-
-        @Override
-        public void run() {
-
-            while (true) {
-
-                try {
-                    //Cada 250ms preguntamos al servidor si tiene ya la foto
-                    die = getPhotoRequest(id);
-                    if (die) break;
-                    wait(1000);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
     }
     public void getPhotosFromServer() {
 
@@ -317,6 +292,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
                     if(photo.getPicture() != null) gridViewAdapter.addPhotoToList(photo.getPicture());
                     swipeRefreshLayout.setRefreshing(false);
                 } else {
+                    Thread.sleep(1000);
                     getPhotoRequest(photo.getUrl());
                 }
             }
