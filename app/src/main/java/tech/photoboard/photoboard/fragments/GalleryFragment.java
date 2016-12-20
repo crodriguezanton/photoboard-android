@@ -240,10 +240,10 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
                 btnTakePhoto.setEnabled(true);
                 Log.e("Raw", response.message()+response.raw().toString());
                 requestData = response.body();
-                if (requestData.isSuccess()) {
-                    //Si es afirmativa, creamos un Thread que espere para recibir la foto
-                    new Thread(new Worker(requestData.getUrl())).start();
-                }
+
+                //Si es afirmativa, creamos un Thread que espere para recibir la foto
+                new Thread(new Worker(requestData.getUrl())).start();
+
             }
 
             @Override
@@ -301,6 +301,8 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
 
         photoReceived = false;
 
+        Log.e("asd","asd");
+
         //Pedimos la foto
         Call<PhotoPool> getPhotoResponse = retrofitAPI.getPhotoResquest(id);
         getPhotoResponse.enqueue(new Callback<PhotoPool>() {
@@ -308,6 +310,8 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
             public void onResponse(Call<PhotoPool> call, Response<PhotoPool> response) {
                 PhotoPool photo = response.body();
                 //Si nos la envia, la añadimos a la lista.
+                Log.e("Raw", response.message()+response.raw().toString());
+
                 if (photo.isReady()) {
                     photoReceived = true;
                     if(photo.getPicture() != null) gridViewAdapter.addPhotoToList(photo.getPicture());
@@ -317,7 +321,7 @@ public class GalleryFragment extends Fragment implements BluetoothListDialogFrag
 
             @Override
             public void onFailure(Call<PhotoPool> call, Throwable t) {
-
+                Log.e("failure","failure");
             }
         });
         return photoReceived;
