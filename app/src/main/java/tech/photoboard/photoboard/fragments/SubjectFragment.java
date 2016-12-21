@@ -77,7 +77,7 @@ public class SubjectFragment extends Fragment {
                         Log.e("Message", subjects.get(i).getShort_name() + " has been added.");
                     }
                 }
-
+                mySPHelper.setSubjects(subjects);
                 subjectsListAdapter.subjects = subjects;
                 subjectsListAdapter.notifyDataSetChanged();
                 swipeRefreshLayout.setRefreshing(false);
@@ -109,8 +109,14 @@ public class SubjectFragment extends Fragment {
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout_subject);
         swipeRefreshLayout.setColorSchemeResources(R.color.refresh_1, R.color.refresh_2, R.color.refresh_3, R.color.refresh_4);
         swipeRefreshLayout.setEnabled(false);
+        if(mySPHelper.getSubjects()==null) {
+            getSubjectsFromServer();
+        } else {
+            subjectsListAdapter.subjects = mySPHelper.getSubjects();
+            subjectsListAdapter.notifyDataSetChanged();
+        }
 
-        getSubjectsFromServer();
+
 
         /*Setting the navigation header*/
         setNavigationDrawerStyle();

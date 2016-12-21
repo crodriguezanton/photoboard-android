@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_log_out) {
             mySPHelper.setLoggedIn(false);
             mySPHelper.removeUser();
-
+            mySPHelper.removeSubjects();
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(intent);
             finish();

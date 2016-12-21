@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
@@ -21,6 +22,7 @@ import tech.photoboard.photoboard.Classes.User;
 public class MySPHelper {
     private static final String ADD_FAVORITE_IN = "ADD_FAVORITE_IN";
     private static final String SUBJECT_ID = "SUBJECT_ID";
+    private static final String SUBJECTS_ARRAY = "SUBJECTS_ARRAY";
     private static final String LOGGED_IN = "LOGGED_IN";
     private static final String USER = "USER";
     private static final String FAV_MODE = "FAV_MODE";
@@ -98,6 +100,21 @@ public class MySPHelper {
     }
     public boolean getFavMode() {
         return sharedPreferences.getBoolean(FAV_MODE, false);
+    }
+
+    public void setSubjects(ArrayList<Subject> subjects) {
+        String json = gson.toJson(subjects);
+        editor.putString(SUBJECTS_ARRAY,json);
+        editor.commit();
+    }
+    public ArrayList<Subject> getSubjects() {
+        String json = sharedPreferences.getString(SUBJECTS_ARRAY, null);
+        Type type = new TypeToken<ArrayList<Subject>>() {}.getType();
+        return gson.fromJson(json, type);
+    }
+    public void removeSubjects() {
+        editor.remove(SUBJECTS_ARRAY);
+        editor.commit();
     }
 }
 
